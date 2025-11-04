@@ -1,0 +1,41 @@
+Tablas para base de datos:
+
+usuarios (user_id, username, email, password_hash, role_id, created_at, profile_pic, bio)
+
+roles (role_id, nombre, descripcion)
+
+surveys (survey_id, titulo, descripcion, crafter_id, categoria_id, estado, 
+         created_at, fecha_limite, es_publica, imagen_url)
+
+questions (question_id, survey_id, pregunta_texto, tipo_pregunta, orden, es_obligatoria)
+
+options (option_id, question_id, opcion_texto, imagen_url, orden)
+
+responses (response_id, player_id, question_id, option_id, respuesta_texto, 
+           fecha_respuesta, player_points_earned)
+
+categorias (category_id, nombre, descripcion, color_hex)
+
+videojuegos (game_id, titulo, desarrolladora, genero, plataformas, año_lanzamiento)
+
+// NUEVAS TABLAS SOCIALES:
+
+user_follows (follower_id, followed_id, fecha_seguimiento)  // Seguir usuarios
+
+survey_likes (user_id, survey_id, fecha_like)  // Me gusta en encuestas
+
+comments (comment_id, user_id, survey_id, comentario_texto, 
+          fecha_comentario, parent_comment_id)  // Comentarios
+
+shares (share_id, user_id, survey_id, fecha_share)  // Compartir encuestas
+
+user_saves (user_id, survey_id, fecha_guardado)  // Guardar encuestas
+
+notifications (notification_id, user_id, tipo, mensaje, 
+               survey_id, emitter_id, fecha, leida)  // Notificaciones
+
+player_stats (user_id, nivel, puntos_totales, encuestas_respondidas, 
+              fecha_ultimo_nivel, logros_desbloqueados)  // Estadísticas player
+
+crafter_stats (user_id, encuestas_creadas, respuestas_totales, 
+               seguidores, rating_promedio)  // Estadísticas crafter
