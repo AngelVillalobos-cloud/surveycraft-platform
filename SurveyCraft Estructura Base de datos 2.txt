@@ -1,0 +1,30 @@
+usuarios (user_id, username, email, password_hash, role_id, created_at, profile_pic, bio)
+
+roles (role_id, nombre, descripcion)
+
+videojuegos (game_id, titulo, desarrolladora, genero, plataformas, año_lanzamiento, descripcion, imagen_url)
+
+surveys (survey_id, titulo, descripcion, crafter_id, estado, created_at, fecha_limite, 
+         es_publica, recompensa_points, es_especifica_juego, juego_id, tipo_encuesta)
+
+questions (question_id, survey_id, pregunta_texto, tipo_pregunta, orden, es_obligatoria)
+
+options (option_id, question_id, opcion_texto, orden)
+
+responses (response_id, player_id, question_id, option_id, respuesta_texto, 
+           fecha_respuesta, player_points_earned, tiempo_jugado, plataforma)
+
+categorias (category_id, nombre, descripcion, color_hex)
+
+useful_ratings (rating_id, user_id, response_id, es_util, fecha_rating)
+
+
+Relaciones:
+usuarios(1) ──── tiene ──── (1) roles
+usuarios(1) ──── crea ──── (N) surveys
+surveys(N) ──── referencia ──── (1) videojuegos (OPCIONAL)
+surveys(1) ──── contiene ──── (N) questions  
+questions(1) ──── tiene ──── (N) options
+usuarios(1) ──── responde ──── (N) responses
+questions(1) ──── recibe ──── (N) responses
+usuarios(N) ──── califica ──── (N) responses (through useful_ratings)

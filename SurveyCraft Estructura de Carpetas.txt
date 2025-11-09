@@ -1,0 +1,59 @@
+surveycraft-platform/
+├── src/
+│   └── main/
+│       ├── java/
+│       │   └── com/
+│       │       └── surveycraft/
+│       │           ├── SurveyCraftApplication.java
+│       │           ├── config/
+│       │           │   └── SecurityConfig.java
+│       │           ├── controller/
+│       │           │   ├── AuthController.java
+│       │           │   ├── SurveyController.java
+│       │           │   └── UserController.java
+│       │           ├── entity/
+│       │           │   ├── User.java
+│       │           │   ├── Role.java
+│       │           │   ├── Survey.java
+│       │           │   ├── Question.java
+│       │           │   ├── Option.java
+│       │           │   ├── Response.java
+│       │           │   └── Videojuego.java
+│       │           ├── repository/
+│       │           │   ├── UserRepository.java
+│       │           │   ├── SurveyRepository.java
+│       │           │   ├── QuestionRepository.java
+│       │           │   └── ResponseRepository.java
+│       │           └── service/
+│       │               ├── UserService.java
+│       │               └── SurveyService.java
+│       └── resources/
+│           ├── static/
+│           │   ├── css/
+│           │   │   ├── style.css
+│           │   │   ├── auth.css
+│           │   │   └── dashboard.css
+│           │   ├── js/
+│           │   │   ├── main.js
+│           │   │   └── survey-builder.js
+│           │   └── images/
+│           │       └── logo.png
+│           ├── templates/
+│           │   ├── fragments/
+│           │   │   ├── header.html
+│           │   │   └── navbar.html
+│           │   ├── auth/
+│           │   │   ├── login.html
+│           │   │   └── register.html
+│           │   ├── crafter/
+│           │   │   ├── dashboard.html
+│           │   │   └── create-survey.html
+│           │   ├── player/
+│           │   │   ├── dashboard.html
+│           │   │   └── take-survey.html
+│           │   └── home.html
+│           └── application.properties
+├── database/
+│   └── schema.sql
+├── .gitignore
+└── pom.xml

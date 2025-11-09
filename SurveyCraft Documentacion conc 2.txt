@@ -1,0 +1,94 @@
+🚀 SURVEYCRAFT GAMING PLATFORM - VERSIÓN MEJORADA
+CONCEPTO:
+"Plataforma de encuestas gaming donde Crafters crean encuestas ESPECÍFICAS y ACCIONABLES, y Players generan datos ÚTILES para la comunidad"
+
+## INFORMACIÓN GENERAL
+**Nombre:** SurveyCraft Gaming Platform
+**Descripción:** Plataforma web de encuestas sobre videojuegos con roles separados (Crafters y Players)
+**Objetivo:** Sistema web para creación, respuesta y análisis de encuestas gaming con gamificación
+
+## ARQUITECTURA TÉCNICA
+**Frontend:** HTML5, CSS3, JavaScript, Bootstrap 5.3, Chart.js, Thymeleaf
+**Backend:** Spring Boot 3.1, Spring Security, Spring Data JPA
+**Base de Datos:** Oracle SQL
+**Herramientas:** IntelliJ, Git/GitHub, Postman
+
+## MODELO DE BASE DE DATOS
+### Tablas Principales:
+- usuarios (user_id, username, email, password_hash, role_id)
+- roles (role_id, nombre, descripcion)
+- surveys (
+    survey_id, titulo, descripcion, crafter_id, estado,
+    // NUEVO: Campos para encuestas útiles
+    es_especifica_juego BOOLEAN DEFAULT FALSE,
+    juego_id INT REFERENCES videojuegos(game_id),
+    tipo_encuesta ENUM('compra', 'analisis', 'estado', 'actualizacion', 'general'),
+    plantilla_usada VARCHAR(50)
+)
+- questions (question_id, survey_id, pregunta_texto, tipo_pregunta)
+- options (option_id, question_id, opcion_texto)-----
+- responses (
+    response_id, player_id, question_id, option_id,
+    // NUEVO: Para calidad de datos
+    tiempo_jugado_juego ENUM('0-10h', '10-50h', '50+h'),
+    plataforma_usada VARCHAR(20),
+    es_util BOOLEAN DEFAULT TRUE
+)
+- categorias, videojuegos, craft_tools
+-useful_ratings (
+    rating_id, user_id, response_id, es_util BOOLEAN,
+    fecha_rating
+
+🎯 SISTEMA DE ROLES (MANTENIDO)
+CRAFTERS:
+Crear encuestas específicas por juego
+
+Usar plantillas predefinidas para datos útiles
+
+Acceder a analytics profundos por juego
+
+Exportar reportes accionables
+
+PLAYERS:
+Responder encuestas que ayudan a otros jugadores
+
+Ganar puntos por datos de calidad
+
+Ver resultados que informan decisiones
+
+Seguir juegos y temas de interés
+
+
+1. ENCUESTAS DE COMPRA/RECOMENDACIÓN
+"¿Vale la pena comprar [JUEGO]?"
+- Sí, absolutamente (⭐⭐⭐⭐⭐)
+- Sí, con algunos peros (⭐⭐⭐)  
+- Solo si está en oferta (⭐⭐)
+- No lo recomiendo (⭐)
+- No lo he jugado (Ver resultados)
+
+"¿Qué juego comprar: [A] vs [B]?"
+
+2. ENCUESTAS DE ANÁLISIS POST-LANZAMIENTO
+"Análisis Detallado: [JUEGO]"
+- Calidad gráficos (1-5)
+- Estabilidad/rendimiento (1-5)
+- Calidad historia (1-5)
+- Valor de rejugabilidad (1-5)
+- Precio justificado (Sí/No)
+
+3. ENCUESTAS DE ESTADO DE JUEGOS LIVE-SERVICE
+"Estado Actual: [JUEGO MULTIPLAYER]"
+- Balance del gameplay (1-5)
+- Calidad matchmaking (1-5)
+- Contenido suficiente (1-5)
+- Comunidad tóxica (Sí/No)
+- ¿Sigue siendo divertido? (Sí/No)
+
+4. ENCUESTAS DE ACTUALIZACIONES/DLCs
+"Opinión: [DLC/ACTUALIZACIÓN] de [JUEGO]"
+- Calidad del contenido (1-5)
+- Precio justificado (Sí/No)
+- Impacto en juego base (Positivo/Negativo)
+- ¿Recomiendas comprar? (Sí/No)
+
