@@ -1,0 +1,25 @@
+###Para subir por primera vez:
+
+#Configurar tu cuenta y nombre de usuario en intelij
+git config --global user.email "a367987@uach.mx"
+git config --global user.name "AngelVillalobos-cloud"
+git remote -v
+
+git init
+git remote add origin https://github.com/AngelVillalobos-cloud/surveycraft-platform.git
+git add .
+git commit -m "Initial commit - proyecto survey-craft"
+git push -u origin main
+
+
+###Para subir avances proyecto
+#Para checar todas las ramas que hay
+git status
+#Para crear la nueva rama
+#en lo subrayado añadir el nuevo nombre
+git checkout -b backend_persona2
+ignorar esto	----------------
+git branch
+
+git push -u origin backend_persona2
+
