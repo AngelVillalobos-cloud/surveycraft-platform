@@ -1,0 +1,93 @@
+Estructura de carpetas 2.0
+```
+surveycraft-platform/
+├── src/
+│   └── main/
+│       ├── java/
+│       │   └── com/
+│       │       └── surveycraft/
+│       │           ├── SurveyCraftApplication.java      # (P0) Inicia toda la aplicación Spring Boot.
+│       │           │
+│       │           ├── config/                          # (P1) Paquete para configuración de seguridad.
+│       │           │   └── SecurityConfig.java          # (P1) Define roles, JWT y qué endpoints están protegidos.
+│       │           │
+│       │           ├── controller/                      # Paquete para los "endpoints" (URLs de la API).
+│       │           │   ├── AuthController.java          # (P1) Endpoints para /login y /register.
+│       │           │   ├── UserController.java          # (P1) Endpoints para gestionar perfiles de usuario.
+│       │           │   ├── SurveyController.java        # (P2) Endpoints para /surveys (crear, responder, ver resultados).
+│       │           │   └── GameController.java          # (P2) Endpoints para /games (crear, listar juegos).
+│       │           │
+│       │           ├── dto/                             # Paquete para "cajas" de datos (DTOs) que se mueven entre front y back.
+│       │           │   ├── auth/                        # (P1) DTOs para autenticación.
+│       │           │   │   ├── LoginRequest.java      # (P1) Define el JSON para el login {email, password}.
+│       │           │   │   └── RegisterRequest.java   # (P1) Define el JSON para el registro de usuario.
+│       │           │   │
+│       │           │   ├── survey/                      # (P2) DTOs para el módulo de encuestas.
+│       │           │   │   ├── CreateSurveyRequest.java # (P2) JSON para crear una encuesta (con preguntas y opciones).
+│       │           │   │   ├── SubmitResponseRequest.java # (P2) JSON para enviar las respuestas de un player.
+│       │           │   │   └── SurveyResultsDTO.java  # (P2) JSON que devuelve los resultados contados (la "utilidad").
+│       │           │   │
+│       │           │   └── game/                        # (P2) DTOs para el módulo de juegos.
+│       │           │       └── GameDTO.java           # (P2) JSON para crear o mostrar un videojuego.
+│       │           │
+│       │           ├── entity/                          # Paquete para las clases que mapean a tablas de la BD (Entidades).
+│       │           │   ├── User.java                  # (P1) Tabla 'usuarios'.
+│       │           │   ├── Role.java                  # (P1) Tabla 'roles' (CRAFTER, PLAYER).
+│       │           │   ├── Survey.java                # (P2) Tabla 'surveys'.
+│       │           │   ├── Question.java              # (P2) Tabla 'questions'.
+│       │           │   ├── Option.java                # (P2) Tabla 'options' (las opciones de una pregunta).
+│       │           │   ├── Response.java              # (P2) Tabla 'responses' (la respuesta guardada de un player).
+│       │           │   ├── Videojuego.java            # (P2) Tabla 'videojuegos'.
+│       │           │   └── Category.java              # (P2) Tabla 'categorias' (de los juegos).
+│       │           │
+│       │           ├── repository/                      # Paquete para interfaces que hablan con la BD (CRUD).
+│       │           │   ├── UserRepository.java        # (P1) Habla con la tabla 'usuarios'.
+│       │           │   ├── RoleRepository.java        # (P1) Habla con la tabla 'roles'.
+│       │           │   ├── SurveyRepository.java      # (P2) Habla con la tabla 'surveys'.
+│       │           │   ├── QuestionRepository.java    # (P2) Habla con la tabla 'questions'.
+│       │           │   ├── OptionRepository.java      # (P2) Habla con la tabla 'options'.
+│       │           │   ├── ResponseRepository.java    # (P2) Habla con la tabla 'responses'.
+│       │           │   ├── VideojuegoRepository.java  # (P2) Habla con la tabla 'videojuegos'.
+│       │           │   └── CategoryRepository.java    # (P2) Habla con la tabla 'categorias'.
+│       │           │
+│       │           └── service/                         # Paquete para la lógica de negocio (el "cerebro").
+│       │               ├── UserService.java           # (P1) Lógica de usuarios (cargarlos para login, crear).
+│       │               ├── SurveyService.java         # (P2) Lógica de encuestas (crear, responder, *calcular resultados*).
+│       │               └── GameService.java           # (P2) Lógica de juegos (crear, listar, buscar).
+│       │
+│       └── resources/                           # Paquete para archivos que no son Java (configuración, frontend).
+│           ├── static/                          # Archivos públicos (CSS, JS, Imágenes).
+│           │   ├── css/
+│           │   │   ├── style.css              # (P1) Estilos generales del sitio.
+│           │   │   ├── auth.css               # (P1) Estilos para login/registro.
+│           │   │   └── dashboard.css          # (P2) Estilos para los paneles de Crafter/Player.
+│           │   ├── js/
+│           │   │   ├── main.js                # (P1) Lógica JS general del sitio.
+│           │   │   └── survey-builder.js      # (P2) Lógica JS para el creador de encuestas.
+│           │   └── images/
+│           │       └── logo.png               # (P0) Logo de la aplicación.
+│           │
+│           ├── templates/                       # Plantillas HTML (Thymeleaf) para el frontend.
+│           │   ├── fragments/                   # (P1) Pedazos de HTML reutilizables.
+│           │   │   ├── header.html            # (P1) El <head> HTML, imports de CSS/JS.
+│           │   │   └── navbar.html            # (P1) Barra de navegación superior.
+│           │   ├── auth/                        # (P1) Vistas de autenticación.
+│           │   │   ├── login.html             # (P1) Formulario de inicio de sesión.
+│           │   │   └── register.html          # (P1) Formulario de registro.
+│           │   ├── crafter/                     # (P2) Vistas para el rol Crafter.
+│           │   │   ├── dashboard.html         # (P2) Panel principal del Crafter.
+│           │   │   └── create-survey.html     # (P2) Formulario para crear encuestas.
+│           │   ├── player/                      # (P2) Vistas para el rol Player.
+│           │   │   ├── dashboard.html         # (P2) Panel principal del Player.
+│           │   │   └── take-survey.html       # (P2) Vista para responder una encuesta.
+│           │   └── home.html                    # (P1) Página de inicio (landing page).
+│           │
+│           └── application.properties           # (P1) Configuración central (base de datos, puerto, etc.).
+│
+├── database/
+│   └── schema.sql                         # (P1/P2) Script para crear todas las tablas en Oracle SQL.
+│
+├── .gitignore                               # (P0) Archivo que le dice a Git qué ignorar (ej. /target).
+└── pom.xml                                  # (P0) Define las dependencias del proyecto (Spring, Oracle, etc.).
+```
+
