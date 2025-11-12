@@ -1,0 +1,118 @@
+### 🚀 SURVEYCRAFT GAMING PLATFORM - DOCUMENTACIÓN 3.0
+
+### 1\. CONCEPTO
+
+"Plataforma de encuestas gaming donde Crafters crean encuestas **ESPECÍFICAS** y **ACCIONABLES**, y Players generan datos **ÚTILES** para la comunidad"
+
+### 2\. INFORMACIÓN GENERAL
+
+  * **Nombre:** SurveyCraft Gaming Platform
+  * **Descripción:** Plataforma web de encuestas sobre videojuegos con roles separados (Crafters y Players).
+  * **Objetivo (MVP):** Sistema web para creación, respuesta y **análisis visual** de encuestas de videojuegos.
+
+### 3\. ARQUITECTURA TÉCNICA
+
+  * **Frontend:** HTML5, CSS3, JavaScript, Bootstrap 5.3, **Chart.js** (para la utilidad), Thymeleaf
+  * **Backend:** Spring Boot 3.1, Spring Security, Spring Data JPA
+  * **Base de Datos:** Oracle SQL
+  * **Herramientas:** IntelliJ, Git/GitHub, Postman
+
+### 4\. MODELO DE BASE DE DATOS (MVP v1.0)
+
+Tablas principales que se construirán en esta versión.
+
+  * `usuarios` (user\_id, username, email, password\_hash, role\_id)
+  * `roles` (role\_id, nombre, descripcion)
+  * `videojuegos` (game\_id, titulo, descripcion, categoria\_id)
+  * `categorias` (categoria\_id, nombre\_categoria)
+  * `surveys` (
+      * survey\_id, titulo, descripcion, crafter\_id, estado,
+      * `es_especifica_juego BOOLEAN`,
+      * `juego_id INT REFERENCES videojuegos(game_id)`,
+      * `tipo_encuesta ENUM('compra', 'analisis', 'estado', 'general')`
+        )
+  * `questions` (question\_id, survey\_id, pregunta\_texto, tipo\_pregunta)
+  * `options` (option\_id, question\_id, opcion\_texto)
+  * `responses` (
+      * response\_id, player\_id, question\_id, option\_id,
+      * `tiempo_jugado_juego ENUM('0-10h', '10-50h', '50+h')`,
+      * `plataforma_usada VARCHAR(20)`
+        )
+
+
+### 5\. SISTEMA DE ROLES (MVP v1.0)
+
+Funcionalidad simplificada para el lanzamiento.
+
+  * **CRAFTERS:**
+      * Crear encuestas específicas por juego.
+      * Usar plantillas predefinidas.
+      * **Acceder a los resultados y análisis visuales (gráficos).**
+  * **PLAYERS:**
+      * Responder encuestas.
+      * **Ver resultados que informan decisiones.**
+      * Filtrar encuestas por juego.
+
+### 6\. LÓGICA DE UTILIDAD (El "Por Qué")
+
+El backend no solo almacena datos, sino que los procesa para que el frontend (con `Chart.js`) pueda mostrar **gráficos útiles**.
+
+1.  **Contexto:** Un `GameService` gestiona la lista de `Videojuegos` (el contexto).
+2.  **Creación/Recolección:** Un `SurveyService` permite a los *Crafters* crear encuestas (vinculadas a un `Videojuego`) y a los *Players* responderlas (guardando `Responses`).
+3.  **Análisis (La Utilidad):** El `SurveyService` tiene un método clave: `getSurveyResults()`.
+      * Este método es llamado por el `SurveyController` (ej. `GET /api/surveys/{id}/results`).
+      * Consulta el `ResponseRepository` para **contar** todos los votos (`Response`) para cada `Option` de una `Question`.
+      * Devuelve un DTO (`SurveyResultsDTO`) con los conteos y porcentajes listos para ser graficados.
+
+### 7\. PLAN DE TRABAJO (BACKEND)
+
+El desarrollo del backend se divide en dos partes claras:
+
+#### 🔵 PARTE 1: NÚCLEO Y AUTENTICACIÓN (P1)
+
+  * **Responsabilidad:** Que un usuario pueda registrarse, iniciar sesión y tener un rol (Crafter/Player). Establece la seguridad base.
+  * **Módulos Involucrados:** `config/SecurityConfig`, `controller/AuthController`, `controller/UserController`, `service/UserService`, `entity/User`, `entity/Role`, `repository/User`, `repository/Role`, `dto/auth/`.
+
+#### 🟢 PARTE 2: LÓGICA DE NEGOCIO (P2 - EL MVP)
+
+  * **Responsabilidad:** Implementar la funcionalidad central de la plataforma.
+  * **Módulos Involucrados:**
+    1.  **Módulo de Juegos (Contexto):**
+          * `GameController`, `GameService`, `Videojuego`, `Category` (y sus repositorios/DTOs).
+    2.  **Módulo de Encuestas (Utilidad):**
+          * `SurveyController`, `SurveyService`, `Survey`, `Question`, `Option`, `Response` (y sus repositorios/DTOs).
+
+### 8\. ARQUITECTURA DE SOFTWARE (EL ÁRBOL MVP)
+
+El plan de trabajo resulta en la siguiente estructura de paquetes:
+
+```
+com/
+└── surveycraft/
+    ├── config/
+    │   └── SecurityConfig.java          # (P1)
+    ├── controller/
+    │   ├── AuthController.java          # (P1)
+    │   ├── UserController.java          # (P1)
+    │   ├── SurveyController.java        # (P2)
+    │   └── GameController.java          # (P2)
+    ├── dto/
+    │   ├── auth/ (LoginRequest, ...)    # (P1)
+    │   ├── survey/ (CreateSurvey, ...)  # (P2)
+    │   └── game/ (GameDTO, ...)         # (P2)
+    ├── entity/
+    │   ├── User.java, Role.java         # (P1)
+    │   ├── Survey.java, Question.java, ... # (P2)
+    │   └── Videojuego.java, Category.java # (P2)
+    ├── repository/
+    │   ├── UserRepository.java, ...     # (P1)
+    │   ├── SurveyRepository.java, ...   # (P2)
+    │   └── VideojuegoRepository.java, ... # (P2)
+    └── service/
+        ├── UserService.java           # (P1)
+        ├── SurveyService.java         # (P2)
+        └── GameService.java           # (P2)
+```
+
+-----
+?
