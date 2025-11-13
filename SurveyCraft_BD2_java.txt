@@ -1,0 +1,149 @@
+//CUIDADO CON ESTO
+// EN TEORIA ESTA BIEN, o eso quiero creer
+
+
+
+// Corresponde a la tabla 'roless'
+public class Rol {
+    
+    private Long roleId;
+    private String nombre;
+    private String descripcion;
+    
+    // --- Constructores ---
+    public Rol() {
+    }
+    
+    // --- Getters y Setters ---
+    public Long getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(Long roleId) {
+        this.roleId = roleId;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+}
+
+
+
+// Corresponde a la tabla 'usuarios'
+public class Usuario {
+    
+    private Long userId;
+    private String username;
+    private String email;
+    private String passwordHash;
+    
+    // Esta es la clave foránea. 
+    // En un ORM (como JPA/Hibernate), esto sería: private Rol rol;
+    private Long roleId;
+    
+    // Getters y Setters omitidos por brevedad...
+}
+
+
+
+// Corresponde a la tabla 'categorias'
+public class Categoria {
+    
+    private Long categoriaId;
+    private String nombreCategoria;
+    
+    // Getters y Setters omitidos por brevedad...
+}
+
+
+
+// Corresponde a la tabla 'videojuegos'
+public class Videojuego {
+    
+    private Long gameId;
+    private String titulo;
+    private String descripcion;
+    
+    // Clave foránea
+    private Long categoriaId;
+    
+    // Getters y Setters omitidos por brevedad...
+}
+
+
+
+// Corresponde a la tabla 'surveys'
+// Nota: La columna 'es_especifica_juego' estaba comentada en tu script.
+public class Survey {
+    
+    private Long surveyId;
+    private String titulo;
+    private String descripcion;
+    private String estado;
+    private String tipoEncuesta;
+    
+    // Claves foráneas
+    private Long crafterId; // (Un Usuario)
+    private Long juegoId;   // (Un Videojuego)
+    
+    // Getters y Setters omitidos por brevedad...
+}
+
+
+
+// Corresponde a la tabla 'questions'
+public class Question {
+    
+    private Long questionId;
+    private String preguntaTexto;
+    private String tipoPregunta;
+    
+    // Clave foránea
+    private Long surveyId;
+    
+    // Getters y Setters omitidos por brevedad...
+}
+
+
+
+// Corresponde a la tabla 'optionss'
+public class Option {
+    
+    private Long optionId;
+    private String opcionTexto;
+    
+    // Clave foránea
+    private Long questionId;
+    
+    // Getters y Setters omitidos por brevedad...
+}
+
+
+
+// Corresponde a la tabla 'responses'
+public class Response {
+    
+    private Long responseId;
+    private String tiempoJugado;
+    private String plataformaUsada;
+    
+    // Claves foráneas
+    private Long playerId;
+    private Long questionId;
+    private Long optionId;
+    
+    // Getters y Setters omitidos por brevedad...
+}
