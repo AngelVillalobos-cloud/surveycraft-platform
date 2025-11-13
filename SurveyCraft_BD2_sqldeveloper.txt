@@ -1,0 +1,83 @@
+DROP TABLE usuarios CASCADE CONSTRAINTS;
+DROP TABLE roless CASCADE CONSTRAINTS;
+DROP TABLE videojuegos CASCADE CONSTRAINTS;
+DROP TABLE categorias CASCADE CONSTRAINTS;
+DROP TABLE surveys CASCADE CONSTRAINTS;
+DROP TABLE questions CASCADE CONSTRAINTS;
+DROP TABLE optionss CASCADE CONSTRAINTS;
+DROP TABLE responses CASCADE CONSTRAINTS;
+
+DROP TABLE plataformas CASCADE CONSTRAINTS;
+
+CREATE TABLE usuarios
+    (user_id NUMBER(6),
+    username VARCHAR2(20),
+    email VARCHAR2(50),
+    password_hash VARCHAR2(20),
+    role_id NUMBER(6));
+
+CREATE TABLE roless
+    (role_id NUMBER(6),
+    nombre VARCHAR2(20),
+    descripcion VARCHAR2(50));
+
+CREATE TABLE videojuegos
+    (game_id NUMBER(6),
+    titulo VARCHAR2(20),
+    descripcion VARCHAR2(50),
+    categoria_id NUMBER(6));
+
+CREATE TABLE categorias
+    (categoria_id NUMBER(6),
+    nombre_categoria VARCHAR2(20));
+
+CREATE TABLE surveys
+    (survey_id NUMBER(6),
+    titulo VARCHAR2(20),
+    descripcion VARCHAR2(50),
+    crafter_id NUMBER(6),
+    estado VARCHAR2(20),
+    --es_especifica_juego BOOLEAN,
+    juego_id NUMBER(6),
+    tipo_encuesta VARCHAR2(20));
+
+CREATE TABLE questions
+    (question_id NUMBER(6),
+    survey_id NUMBER(6),
+    pregunta_texto VARCHAR2(50),
+    tipo_pregunta VARCHAR2(20));
+
+CREATE TABLE optionss
+    (option_id NUMBER(6),
+    question_id NUMBER(6),
+    opcion_texto VARCHAR2(20));
+
+CREATE TABLE responses
+    (response_id NUMBER(6),
+    player_id NUMBER(6),
+    question_id NUMBER(6),
+    option_id NUMBER(6),
+    tiempo_jugado VARCHAR2(20),
+    plataforma_usada VARCHAR2(20));
+    
+    
+
+
+ALTER TABLE roless ADD CONSTRAINT pk_roless PRIMARY KEY (role_id);
+ALTER TABLE usuarios ADD CONSTRAINT pk_usuarios PRIMARY KEY (user_id);
+ALTER TABLE categorias ADD CONSTRAINT pk_categorias PRIMARY KEY (categoria_id);
+ALTER TABLE videojuegos ADD CONSTRAINT pk_videojuegos PRIMARY KEY (game_id);
+ALTER TABLE surveys ADD CONSTRAINT pk_surveys PRIMARY KEY (survey_id);
+ALTER TABLE questions ADD CONSTRAINT pk_questions PRIMARY KEY (question_id);
+ALTER TABLE optionss ADD CONSTRAINT pk_optionss PRIMARY KEY (option_id);
+ALTER TABLE responses ADD CONSTRAINT pk_responses PRIMARY KEY (response_id);
+
+ALTER TABLE usuarios ADD CONSTRAINT fk_usuarios_role FOREIGN KEY (role_id) REFERENCES roless(role_id);
+ALTER TABLE videojuegos ADD CONSTRAINT fk_videojuegos_categoria FOREIGN KEY (categoria_id) REFERENCES categorias(categoria_id);
+ALTER TABLE surveys ADD CONSTRAINT fk_surveys_crafter FOREIGN KEY (crafter_id) REFERENCES usuarios(user_id);
+ALTER TABLE surveys ADD CONSTRAINT fk_surveys_juego FOREIGN KEY (juego_id) REFERENCES videojuegos(game_id);
+ALTER TABLE questions ADD CONSTRAINT fk_questions_survey FOREIGN KEY (survey_id) REFERENCES surveys(survey_id);
+ALTER TABLE optionss ADD CONSTRAINT fk_optionss_question FOREIGN KEY (question_id) REFERENCES questions(question_id);
+ALTER TABLE responses ADD CONSTRAINT fk_responses_player FOREIGN KEY (player_id) REFERENCES usuarios(user_id);
+ALTER TABLE responses ADD CONSTRAINT fk_responses_question FOREIGN KEY (question_id) REFERENCES questions(question_id);
+ALTER TABLE responses ADD CONSTRAINT fk_responses_option FOREIGN KEY (option_id) REFERENCES optionss(option_id);
