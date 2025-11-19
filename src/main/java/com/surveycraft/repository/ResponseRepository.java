@@ -1,6 +1,7 @@
 package com.surveycraft.repository;
 
 
+import com.surveycraft.entity.Option;
 import com.surveycraft.entity.Response;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -29,4 +30,6 @@ public interface ResponseRepository extends JpaRepository<Response, Long> {
     
     @Query("SELECT r FROM Response r WHERE r.playerId = :playerId AND r.questionId IN (SELECT q.questionId FROM Question q WHERE q.surveyId = :surveyId)")
     List<Response> findPlayerResponsesForSurvey(@Param("playerId") Long playerId, @Param("surveyId") Long surveyId);
+    
+    long countBySelectedOption(Option selectedOption);
 }

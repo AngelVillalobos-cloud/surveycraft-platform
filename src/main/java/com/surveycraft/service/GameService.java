@@ -35,7 +35,7 @@ public class GameService {
         Videojuego newGame = new Videojuego();
         newGame.setTitulo(gameDTO.getTitulo());
         newGame.setDescripcion(gameDTO.getDescripcion());
-        newGame.setCategory(category); // Asignar la entidad completa
+        newGame.setCategoria(category); // Asignar la entidad completa
 
         // 3. Guardar la Entidad en la BD
         Videojuego savedGame = videojuegoRepository.save(newGame);
@@ -76,14 +76,14 @@ public class GameService {
         
         // Rellenar campos de Salida
         dto.setId(game.getId());
-        dto.setCategoriaNombre(game.getCategory().getNombreCategoria());
+        dto.setNombreCategoria(game.getCategoria().getNombreCategoria());
         
         // Rellenar campos comunes
         dto.setTitulo(game.getTitulo());
         dto.setDescripcion(game.getDescripcion());
         
         // Rellenar campo de referencia (útil si se quiere editar)
-        dto.setCategoriaId(game.getCategory().getId());
+        dto.setCategoriaId(game.getCategoria().getId());
         
         return dto;
     }

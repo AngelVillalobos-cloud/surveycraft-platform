@@ -6,12 +6,21 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import com.surveycraft.entity.Videojuego;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
 @Repository
 public interface VideojuegoRepository extends JpaRepository<Videojuego, Long> {
     
-    // Fundamental para el filtro: "Ver todos los juegos de RPG"
-    List<Videojuego> findByCategoriaId(Long categoriaId);
+    // CORRECCIÓN: Usamos "Category_Id"
+    // "Category" = nombre del campo en la entidad Videojuego
+    // "_" = navega dentro del objeto Category
+    // "Id" = nombre del campo ID dentro de Category
+    List<Videojuego> findByCategory_Id(Long categoriaId);
 
-    // Buscador por título (ej. buscador en el navbar)
+    // Buscador por título (Este está perfecto)
     List<Videojuego> findByTituloContainingIgnoreCase(String titulo);
 }

@@ -3,6 +3,11 @@ package com.surveycraft.entity;
 import jakarta.persistence.*;
 import java.util.List;
 
+
+import jakarta.persistence.*;
+import java.util.List;
+import java.util.ArrayList;
+
 @Entity
 @Table(name = "questions")
 public class Question {
@@ -10,10 +15,10 @@ public class Question {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "question_id")
-    private Long id;
+    private Long questionId; // <--- CAMBIO: De 'id' a 'questionId'
 
     @Column(name = "pregunta_texto", length = 50)
-    private String texto;
+    private String preguntaTexto; // <--- CAMBIO: De 'texto' a 'preguntaTexto'
 
     @Column(name = "tipo_pregunta", length = 20)
     private String tipoPregunta;
@@ -22,25 +27,25 @@ public class Question {
     @JoinColumn(name = "survey_id")
     private Survey survey;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Option> options;
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
+    private List<Option> options = new ArrayList<>();
 
-    // --- Getters y Setters ---
+    // --- Getters y Setters (Estos son los que busca tu Servicio) ---
 
-    public Long getId() {
-        return id;
+    public Long getQuestionId() { // El servicio busca .getQuestionId()
+        return questionId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setQuestionId(Long questionId) {
+        this.questionId = questionId;
     }
 
-    public String getTexto() {
-        return texto;
+    public String getPreguntaTexto() { // El servicio busca .getPreguntaTexto()
+        return preguntaTexto;
     }
 
-    public void setTexto(String texto) {
-        this.texto = texto;
+    public void setPreguntaTexto(String preguntaTexto) { // El servicio busca .setPreguntaTexto()
+        this.preguntaTexto = preguntaTexto;
     }
 
     public String getTipoPregunta() {
