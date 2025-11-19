@@ -2,6 +2,12 @@ package com.surveycraft.dto.survey;
 
 import java.util.List;
 
+
+
+import java.util.ArrayList;
+
+
+
 public class SurveyResultsDTO {
 
     // Información General
@@ -10,141 +16,79 @@ public class SurveyResultsDTO {
     private String descripcion;
     private Long juegoId;
     
+    // --- ¡AQUÍ ESTABA EL ERROR! ---
+    // Necesitas declarar esta variable para que el get/set funcionen
+    private String estado; 
+    // -----------------------------
+
     // Datos globales de participación
-    private long totalRespuestas; // Total de personas que han respondido
+    private long totalRespuestas; 
 
     // Las preguntas con sus resultados anidados
-    private List<QuestionResultDTO> preguntas;
+    private List<QuestionResultDTO> preguntas = new ArrayList<>();
 
     // --- Getters y Setters ---
+    
+    public Long getSurveyId() { return surveyId; }
+    public void setSurveyId(Long surveyId) { this.surveyId = surveyId; }
 
-    public Long getSurveyId() {
-        return surveyId;
-    }
+    public String getTitulo() { return titulo; }
+    public void setTitulo(String titulo) { this.titulo = titulo; }
 
-    public void setSurveyId(Long surveyId) {
-        this.surveyId = surveyId;
-    }
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
-    public String getTitulo() {
-        return titulo;
-    }
+    public Long getJuegoId() { return juegoId; }
+    public void setJuegoId(Long juegoId) { this.juegoId = juegoId; }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
-    }
+    // --- Getters y Setters para ESTADO ---
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; } // Ahora sí funcionará
+    // -------------------------------------
 
-    public String getDescripcion() {
-        return descripcion;
-    }
+    public long getTotalRespuestas() { return totalRespuestas; }
+    public void setTotalRespuestas(long totalRespuestas) { this.totalRespuestas = totalRespuestas; }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
+    public List<QuestionResultDTO> getPreguntas() { return preguntas; }
+    public void setPreguntas(List<QuestionResultDTO> preguntas) { this.preguntas = preguntas; }
 
-    public Long getJuegoId() {
-        return juegoId;
-    }
-
-    public void setJuegoId(Long juegoId) {
-        this.juegoId = juegoId;
-    }
-
-    public long getTotalRespuestas() {
-        return totalRespuestas;
-    }
-
-    public void setTotalRespuestas(long totalRespuestas) {
-        this.totalRespuestas = totalRespuestas;
-    }
-
-    public List<QuestionResultDTO> getPreguntas() {
-        return preguntas;
-    }
-
-    public void setPreguntas(List<QuestionResultDTO> preguntas) {
-        this.preguntas = preguntas;
-    }
-
-    // --- Clases internas para la estructura jerárquica ---
+    // --- Clases internas estáticas ---
 
     public static class QuestionResultDTO {
         private Long questionId;
         private String textoPregunta;
         private String tipoPregunta;
-        private List<OptionResultDTO> opciones;
+        private List<OptionResultDTO> opciones = new ArrayList<>();
 
-        public Long getQuestionId() {
-            return questionId;
-        }
+        public Long getQuestionId() { return questionId; }
+        public void setQuestionId(Long questionId) { this.questionId = questionId; }
 
-        public void setQuestionId(Long questionId) {
-            this.questionId = questionId;
-        }
+        public String getTextoPregunta() { return textoPregunta; }
+        public void setTextoPregunta(String textoPregunta) { this.textoPregunta = textoPregunta; }
 
-        public String getTextoPregunta() {
-            return textoPregunta;
-        }
+        public String getTipoPregunta() { return tipoPregunta; }
+        public void setTipoPregunta(String tipoPregunta) { this.tipoPregunta = tipoPregunta; }
 
-        public void setTextoPregunta(String textoPregunta) {
-            this.textoPregunta = textoPregunta;
-        }
-
-        public String getTipoPregunta() {
-            return tipoPregunta;
-        }
-
-        public void setTipoPregunta(String tipoPregunta) {
-            this.tipoPregunta = tipoPregunta;
-        }
-
-        public List<OptionResultDTO> getOpciones() {
-            return opciones;
-        }
-
-        public void setOpciones(List<OptionResultDTO> opciones) {
-            this.opciones = opciones;
-        }
+        public List<OptionResultDTO> getOpciones() { return opciones; }
+        public void setOpciones(List<OptionResultDTO> opciones) { this.opciones = opciones; }
     }
 
     public static class OptionResultDTO {
         private Long optionId;
         private String textoOpcion;
-        
-        // Datos para Chart.js
-        private long votos;       // Cantidad absoluta (ej: 150)
-        private double porcentaje; // Porcentaje calculado (ej: 35.5)
+        private long votos;       
+        private double porcentaje;
 
-        public Long getOptionId() {
-            return optionId;
-        }
+        public Long getOptionId() { return optionId; }
+        public void setOptionId(Long optionId) { this.optionId = optionId; }
 
-        public void setOptionId(Long optionId) {
-            this.optionId = optionId;
-        }
+        public String getTextoOpcion() { return textoOpcion; }
+        public void setTextoOpcion(String textoOpcion) { this.textoOpcion = textoOpcion; }
 
-        public String getTextoOpcion() {
-            return textoOpcion;
-        }
+        public long getVotos() { return votos; }
+        public void setVotos(long votos) { this.votos = votos; }
 
-        public void setTextoOpcion(String textoOpcion) {
-            this.textoOpcion = textoOpcion;
-        }
-
-        public long getVotos() {
-            return votos;
-        }
-
-        public void setVotos(long votos) {
-            this.votos = votos;
-        }
-
-        public double getPorcentaje() {
-            return porcentaje;
-        }
-
-        public void setPorcentaje(double porcentaje) {
-            this.porcentaje = porcentaje;
-        }
+        public double getPorcentaje() { return porcentaje; }
+        public void setPorcentaje(double porcentaje) { this.porcentaje = porcentaje; }
     }
 }

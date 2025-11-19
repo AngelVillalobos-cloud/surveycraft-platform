@@ -2,16 +2,20 @@ package com.surveycraft.dto.survey;
 
 import java.util.List;
 
+
 public class CreateSurveyRequest {
 
     private String titulo;
     private String descripcion;
     private Long juegoId;             // ID del videojuego asociado
     private String tipoEncuesta;      // "compra", "analisis", "estado", "general"
-    private boolean esEspecificaJuego;
+    
+    // Lo mantenemos para que el frontend no falle al enviarlo, 
+    // pero recuerda que no se guarda en la BD (columna eliminada).
+    private Boolean esEspecificaJuego; 
 
-    // Lista de preguntas que vienen en el JSON al crear la encuesta
-    private List<CreateQuestionRequest> preguntas;
+    // CAMBIO CLAVE: La lista ahora usa la clase interna 'QuestionRequest'
+    private List<QuestionRequest> preguntas;
 
     // --- Getters y Setters ---
 
@@ -47,27 +51,31 @@ public class CreateSurveyRequest {
         this.tipoEncuesta = tipoEncuesta;
     }
 
-    public boolean isEsEspecificaJuego() {
+    public Boolean getEsEspecificaJuego() {
         return esEspecificaJuego;
     }
 
-    public void setEsEspecificaJuego(boolean esEspecificaJuego) {
+    public void setEsEspecificaJuego(Boolean esEspecificaJuego) {
         this.esEspecificaJuego = esEspecificaJuego;
     }
 
-    public List<CreateQuestionRequest> getPreguntas() {
+    public List<QuestionRequest> getPreguntas() {
         return preguntas;
     }
 
-    public void setPreguntas(List<CreateQuestionRequest> preguntas) {
+    public void setPreguntas(List<QuestionRequest> preguntas) {
         this.preguntas = preguntas;
     }
 
-    // --- Clase interna estática para las preguntas ---
-    public static class CreateQuestionRequest {
+    // --- Clase interna estática (Renombrada para coincidir con SurveyService) ---
+    
+    public static class QuestionRequest { // Antes era CreateQuestionRequest
+        
         private String texto;
-        private String tipoPregunta;   // "single_choice", "multiple_choice"
-        private List<String> opciones; // ["Sí", "No", "Tal vez"]
+        private String tipoPregunta;   // "single_choice", "rating", etc.
+        private List<String> opciones; // ["Sí", "No"]
+
+        // Getters y Setters de la clase interna
 
         public String getTexto() {
             return texto;
