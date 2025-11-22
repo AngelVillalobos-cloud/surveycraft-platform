@@ -15,13 +15,13 @@ public interface SurveyRepository extends JpaRepository<Survey, Long> {
     List<Survey> findByEstado(String estado);
 
     // Ver encuestas creadas por un Crafter específico
-    List<Survey> findByCrafterId(Long crafterId);
+    List<Survey> findByCrafter_UserId(Long userId);
 
     // Buscar por tipo (compra, analisis, etc.)
     List<Survey> findByTipoEncuesta(String tipoEncuesta);
 
     // Obtener encuestas de un juego específico
     // Asumiendo que en la entidad Survey la propiedad se llama 'juego'
-    @Query("SELECT s FROM Survey s WHERE s.juego.id = :juegoId")
+    @Query("SELECT s FROM Survey s WHERE s.juegoId = :juegoId")
     List<Survey> findByJuegoId(@Param("juegoId") Long juegoId);
 }

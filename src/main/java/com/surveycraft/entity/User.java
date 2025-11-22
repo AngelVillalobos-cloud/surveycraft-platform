@@ -19,7 +19,7 @@ public class User {
     private String email;
 
     // Mapeamos 'password_hash' a la variable 'password' para que sea más estándar en Java
-    @Column(name = "password_hash", length = 20) 
+    @Column(name = "password_hash", length = 60) 
     private String password;
 
     // --- Relaciones ---

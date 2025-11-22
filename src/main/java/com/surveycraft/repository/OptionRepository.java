@@ -10,5 +10,5 @@ import java.util.List;
 public interface OptionRepository extends JpaRepository<Option, Long> {
     
     // Recuperar las opciones (A, B, C) de una pregunta concreta
-    List<Option> findByQuestionId(Long questionId);
+    List<Option> findByQuestion_QuestionId(Long questionId);
 }

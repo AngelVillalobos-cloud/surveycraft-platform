@@ -19,7 +19,7 @@ public interface VideojuegoRepository extends JpaRepository<Videojuego, Long> {
     // "Category" = nombre del campo en la entidad Videojuego
     // "_" = navega dentro del objeto Category
     // "Id" = nombre del campo ID dentro de Category
-    List<Videojuego> findByCategory_Id(Long categoriaId);
+	List<Videojuego> findByCategoria_Id(Long id);
 
     // Buscador por título (Este está perfecto)
     List<Videojuego> findByTituloContainingIgnoreCase(String titulo);

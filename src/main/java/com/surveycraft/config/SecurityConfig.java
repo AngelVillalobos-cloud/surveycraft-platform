@@ -1,6 +1,5 @@
 package com.surveycraft.config;
 
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,23 +11,26 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-// import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter; 
-// Descomenta la línea de arriba y la del filtro abajo cuando tengas tu JwtAuthenticationFilter
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    // Inyectar tu filtro JWT aquí cuando lo crees
-    // @Autowired private JwtAuthenticationFilter jwtAuthenticationFilter;
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // 1. Desactivar CSRF y configurar CORS (por defecto)
+            // 1. Configurar CORS primero
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            
+            // 2. Desactivar CSRF
             .csrf(csrf -> csrf.disable())
             
-            // 2. Configurar rutas públicas y privadas
+            // 3. Configurar rutas públicas y privadas
             .authorizeHttpRequests(auth -> auth
                 // -- Zona Pública --
                 .requestMatchers("/api/auth/**").permitAll()      // Login y Registro
@@ -46,15 +48,26 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             
-            // 3. Manejo de sesión sin estado (Stateless)
+            // 4. Manejo de sesión sin estado (Stateless)
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             );
 
-        // 4. Añadir el filtro JWT antes del filtro de usuario/contraseña
-        // http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
+    }
+
+    // Configuración de CORS para permitir peticiones desde Postman y frontends
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOriginPatterns(Arrays.asList("*")); // Permite todos los orígenes
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     // Bean para encriptar contraseñas
