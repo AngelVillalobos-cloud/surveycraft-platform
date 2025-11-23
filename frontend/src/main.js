@@ -39,6 +39,15 @@ const submitResponseBtn = document.getElementById('submit-response-btn');
 const respTime = document.getElementById('resp-time');
 const respPlatform = document.getElementById('resp-platform');
 
+// Create Game Modal Elements
+const openCreateGameBtn = document.getElementById('open-create-game-btn');
+const createGameModal = document.getElementById('create-game-modal');
+const newGameTitle = document.getElementById('new-game-title');
+const newGameDesc = document.getElementById('new-game-desc');
+const newGameCategory = document.getElementById('new-game-category');
+const cancelCreateGameBtn = document.getElementById('cancel-create-game-btn');
+const saveGameBtn = document.getElementById('save-game-btn');
+
 let isRegistering = false;
 let currentSurveyId = null;
 let currentEditId = null; // If editing
@@ -515,5 +524,63 @@ submitResponseBtn.addEventListener('click', async () => {
     alert(err.message);
   }
 });
+
+// Create Game Logic
+if (openCreateGameBtn) {
+  openCreateGameBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    newGameTitle.value = '';
+    newGameDesc.value = '';
+    newGameCategory.value = '';
+    createGameModal.classList.remove('hidden');
+  });
+}
+
+if (cancelCreateGameBtn) {
+  cancelCreateGameBtn.addEventListener('click', () => {
+    createGameModal.classList.add('hidden');
+  });
+}
+
+if (saveGameBtn) {
+  saveGameBtn.addEventListener('click', async () => {
+    const title = newGameTitle.value;
+    const desc = newGameDesc.value;
+    const category = newGameCategory.value;
+
+    if (!title || !category) {
+      alert('Título y Categoría son obligatorios');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_URL}/games`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          titulo: title,
+          descripcion: desc,
+          categoriaNombre: category
+        })
+      });
+
+      if (!res.ok) throw new Error('Error al crear el juego');
+
+      const newGame = await res.json();
+      alert(`Juego "${newGame.titulo}" creado en categoría "${newGame.nombreCategoria}"`);
+      createGameModal.classList.add('hidden');
+
+      // Reload games and select the new one
+      await loadCategories();
+      newSurveyGame.value = newGame.id;
+
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+}
 
 init();

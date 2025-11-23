@@ -89,9 +89,13 @@
         <div class="grid-2">
           <div class="form-group">
             <label>Videojuego / Categoría</label>
-            <select id="new-survey-game">
-              <option value="">Cargando juegos...</option>
-            </select>
+            <div style="display: flex; gap: 0.5rem;">
+              <select id="new-survey-game" style="flex: 1;">
+                <option value="">Cargando juegos...</option>
+              </select>
+              <button id="open-create-game-btn" class="btn btn-secondary" style="padding: 0.5rem; min-width: 40px;"
+                title="Crear nuevo juego/categoría">+</button>
+            </div>
           </div>
           <div class="form-group">
             <label>Tipo de Encuesta</label>
@@ -115,6 +119,32 @@
           style="display: flex; justify-content: flex-end; gap: 0.5rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
           <button id="cancel-create-btn" class="btn btn-danger">Cancelar</button>
           <button id="save-survey-btn" class="btn btn-success">Guardar Encuesta</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create Game Modal -->
+    <div id="create-game-modal" class="modal-overlay hidden">
+      <div class="glass-card modal-content" style="width: 90%; max-width: 500px;">
+        <h3>Agregar Nuevo Juego/Categoría</h3>
+        <div class="form-group">
+          <label>Título del Juego</label>
+          <input type="text" id="new-game-title" placeholder="Ej: Minecraft">
+        </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea id="new-game-desc" placeholder="Descripción breve..." style="min-height: 80px;"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Categoría</label>
+          <input type="text" id="new-game-category" placeholder="Ej: Sandbox, RPG, Shooter...">
+          <p class="text-muted" style="font-size: 0.8rem; margin-top: 0.5rem; color: rgba(255,255,255,0.6);">
+            Si la categoría no existe, se creará automáticamente.
+          </p>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem;">
+          <button id="cancel-create-game-btn" class="btn btn-danger">Cancelar</button>
+          <button id="save-game-btn" class="btn btn-success">Guardar</button>
         </div>
       </div>
     </div>

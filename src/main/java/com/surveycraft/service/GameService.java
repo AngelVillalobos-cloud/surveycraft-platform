@@ -22,8 +22,22 @@ public class GameService {
     }
 
     public GameDTO createGame(GameDTO gameDTO) {
-        Category category = categoryRepository.findById(gameDTO.getCategoriaId())
-                .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
+        Category category;
+
+        if (gameDTO.getCategoriaId() != null) {
+            category = categoryRepository.findById(gameDTO.getCategoriaId())
+                    .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
+        } else if (gameDTO.getNombreCategoria() != null && !gameDTO.getNombreCategoria().isEmpty()) {
+            String catName = gameDTO.getNombreCategoria().trim();
+            category = categoryRepository.findByNombreCategoria(catName)
+                    .orElseGet(() -> {
+                        Category newCat = new Category();
+                        newCat.setNombreCategoria(catName);
+                        return categoryRepository.save(newCat);
+                    });
+        } else {
+            throw new RuntimeException("Debe proporcionar categoriaId o nombreCategoria");
+        }
 
         Videojuego newGame = new Videojuego();
         newGame.setTitulo(gameDTO.getTitulo());
