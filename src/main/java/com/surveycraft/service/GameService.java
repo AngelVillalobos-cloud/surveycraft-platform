@@ -1,6 +1,5 @@
 package com.surveycraft.service;
 
-
 import com.surveycraft.dto.game.GameDTO;
 import com.surveycraft.entity.Category;
 import com.surveycraft.entity.Videojuego;
@@ -22,69 +21,58 @@ public class GameService {
         this.categoryRepository = categoryRepository;
     }
 
-    /**
-     * Lógica de CREACIÓN (DTO -> Entidad -> DTO)
-     */
     public GameDTO createGame(GameDTO gameDTO) {
-        
-        // 1. Validar y buscar entidades relacionadas
         Category category = categoryRepository.findById(gameDTO.getCategoriaId())
                 .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
 
-        // 2. Mapear de DTO a Entidad (DTO -> Entity)
         Videojuego newGame = new Videojuego();
         newGame.setTitulo(gameDTO.getTitulo());
         newGame.setDescripcion(gameDTO.getDescripcion());
-        newGame.setCategoria(category); // Asignar la entidad completa
+        newGame.setCategoria(category);
 
-        // 3. Guardar la Entidad en la BD
         Videojuego savedGame = videojuegoRepository.save(newGame);
-
-        // 4. Mapear la Entidad guardada de vuelta a un DTO (Entity -> DTO)
-        //    (Este DTO SÍ tendrá el ID y el nombre de la categoría)
         return mapEntityToDTO(savedGame);
     }
 
-    /**
-     * Lógica de LECTURA (Entidad -> DTO)
-     */
     public GameDTO getGameById(Long id) {
         Videojuego game = videojuegoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Juego no encontrado"));
-        
-        // Mapear la entidad encontrada a un DTO para devolverla
         return mapEntityToDTO(game);
     }
 
-    /**
-     * Lógica de LECTURA MÚLTIPLE (Entidad -> DTO)
-     */
     public List<GameDTO> getAllGames() {
         return videojuegoRepository.findAll().stream()
-                .map(this::mapEntityToDTO) // Usa el mismo mapeador
+                .map(this::mapEntityToDTO)
                 .collect(Collectors.toList());
     }
 
-    // --- MÉTODO AYUDANTE DE MAPEO ---
+    public Videojuego updateGame(Long id, Videojuego gameData) {
+        Videojuego game = videojuegoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Game not found"));
 
-    /**
-     * Mapeador privado que convierte una Entidad a un DTO.
-     * Esta es la clave para rellenar los campos de "Salida".
-     */
+        game.setTitulo(gameData.getTitulo());
+        game.setDescripcion(gameData.getDescripcion());
+        if (gameData.getCategoria() != null) {
+            game.setCategoria(gameData.getCategoria());
+        }
+
+        return videojuegoRepository.save(game);
+    }
+
+    public void deleteGame(Long id) {
+        if (!videojuegoRepository.existsById(id)) {
+            throw new RuntimeException("Game not found");
+        }
+        videojuegoRepository.deleteById(id);
+    }
+
     private GameDTO mapEntityToDTO(Videojuego game) {
         GameDTO dto = new GameDTO();
-        
-        // Rellenar campos de Salida
         dto.setId(game.getId());
         dto.setNombreCategoria(game.getCategoria().getNombreCategoria());
-        
-        // Rellenar campos comunes
         dto.setTitulo(game.getTitulo());
         dto.setDescripcion(game.getDescripcion());
-        
-        // Rellenar campo de referencia (útil si se quiere editar)
         dto.setCategoriaId(game.getCategoria().getId());
-        
         return dto;
     }
 }

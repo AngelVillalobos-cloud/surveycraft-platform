@@ -1,6 +1,5 @@
 package com.surveycraft.service;
 
-
 import com.surveycraft.dto.auth.LoginRequest;
 import com.surveycraft.dto.auth.RegisterRequest;
 import com.surveycraft.entity.Role;
@@ -20,12 +19,11 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    // private final JwtProvider jwtProvider; // Descomentar cuando tengas la clase JWT
 
-    public AuthService(UserRepository userRepository, 
-                       RoleRepository roleRepository, 
-                       PasswordEncoder passwordEncoder,
-                       AuthenticationManager authenticationManager) {
+    public AuthService(UserRepository userRepository,
+            RoleRepository roleRepository,
+            PasswordEncoder passwordEncoder,
+            AuthenticationManager authenticationManager) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -57,15 +55,23 @@ public class AuthService {
     }
 
     // LÓGICA DE LOGIN
-    public String login(LoginRequest request) {
-        // 1. Autenticar usando el Manager de Spring (esto verifica el password automáticamente)
+    public java.util.Map<String, String> login(LoginRequest request) {
+        // 1. Autenticar usando el Manager de Spring (esto verifica el password
+        // automáticamente)
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
-        // 2. Si pasa, generar el Token
-        // Por ahora retornamos un texto dummy hasta que configuremos JWT
-        return "TOKEN_FALSO_TEMPORAL_12345"; 
-        // return jwtProvider.generateToken(authentication); // Lo correcto con JWT
+        // 2. Obtener el usuario para saber su rol
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // 3. Generar respuesta
+        // Token formato: "userId:ROLE_NAME"
+        String token = user.getUserId() + ":" + user.getRole().getNombre();
+
+        return java.util.Map.of(
+                "token", token,
+                "role", user.getRole().getNombre() // Ej: ROLE_CRAFTER
+        );
     }
 }

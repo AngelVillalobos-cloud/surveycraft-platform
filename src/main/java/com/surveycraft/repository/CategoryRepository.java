@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     // Para buscar categorías por nombre (útil para validaciones)
     boolean existsByNombreCategoria(String nombreCategoria);
+
+    java.util.Optional<Category> findByNombreCategoria(String nombreCategoria);
 }

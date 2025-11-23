@@ -1,22 +1,17 @@
 package com.surveycraft.service;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.surveycraft.entity.Survey;
-import com.surveycraft.entity.Question;
-import com.surveycraft.entity.Option;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
+
+import com.surveycraft.entity.*;
+import com.surveycraft.repository.*;
 import com.surveycraft.dto.survey.CreateSurveyRequest;
 import com.surveycraft.dto.survey.SubmitResponseRequest;
 import com.surveycraft.dto.survey.SurveyResultsDTO;
-import com.surveycraft.entity.*;
-import com.surveycraft.repository.*;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
-
 
 @Service
 public class SurveyService {
@@ -28,9 +23,9 @@ public class SurveyService {
     @Autowired
     private OptionRepository optionRepository;
     @Autowired
-    private ResponseRepository responseRepository; 
+    private ResponseRepository responseRepository;
     @Autowired
-    private UserRepository userRepository; 
+    private UserRepository userRepository;
 
     // 1. CREAR ENCUESTA
     @Transactional
@@ -43,7 +38,7 @@ public class SurveyService {
         survey.setDescripcion(request.getDescripcion());
         survey.setJuegoId(request.getJuegoId());
         survey.setTipoEncuesta(request.getTipoEncuesta());
-        survey.setEstado("activa"); 
+        survey.setEstado("activa");
         survey.setCrafter(crafter);
 
         Survey savedSurvey = surveyRepository.save(survey);
@@ -54,7 +49,7 @@ public class SurveyService {
                 question.setPreguntaTexto(qReq.getTexto());
                 question.setTipoPregunta(qReq.getTipoPregunta());
                 question.setSurvey(savedSurvey);
-                
+
                 Question savedQuestion = questionRepository.save(question);
 
                 if (qReq.getOpciones() != null) {
@@ -87,11 +82,10 @@ public class SurveyService {
     // 4. RESPONDER ENCUESTA
     @Transactional
     public void submitResponses(Long surveyId, Long playerId, SubmitResponseRequest request) {
-        // Validamos que existan
         if (!surveyRepository.existsById(surveyId)) {
             throw new RuntimeException("Encuesta no encontrada");
         }
-        
+
         User player = userRepository.findById(playerId)
                 .orElseThrow(() -> new RuntimeException("Player no encontrado"));
 
@@ -100,10 +94,15 @@ public class SurveyService {
             response.setPlayer(player);
             response.setQuestion(questionRepository.getReferenceById(answer.getQuestionId()));
             response.setSelectedOption(optionRepository.getReferenceById(answer.getOptionId()));
-            
-            response.setTiempoJugadoJuego(request.getTiempoJugadoJuego()); // <--- Coincide con tu DTO
+
+            response.setTiempoJugadoJuego(request.getTiempoJugadoJuego());
             response.setPlataformaUsada(request.getPlataformaUsada());
-            
+
+            // Big Data Analytics: Set timestamp and session ID
+            response.setSubmittedAt(java.time.LocalDateTime.now());
+            response.setSessionId(
+                    request.getSessionId() != null ? request.getSessionId() : java.util.UUID.randomUUID().toString());
+
             responseRepository.save(response);
         }
     }
@@ -111,16 +110,75 @@ public class SurveyService {
     // 5. BUSCAR POR TIPO
     public List<SurveyResultsDTO> buscarEncuestasPorTipo(String tipoEncuesta) {
         List<Survey> surveys = surveyRepository.findByTipoEncuesta(tipoEncuesta);
-        
+
         return surveys.stream().map(s -> {
             SurveyResultsDTO dto = new SurveyResultsDTO();
-            dto.setSurveyId(s.getSurveyId()); 
+            dto.setSurveyId(s.getSurveyId());
             dto.setTitulo(s.getTitulo());
             dto.setDescripcion(s.getDescripcion());
             dto.setJuegoId(s.getJuegoId());
             dto.setEstado(s.getEstado());
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    // 6. OBTENER TODAS
+    public List<SurveyResultsDTO> getAllSurveys() {
+        List<Survey> surveys = surveyRepository.findAll();
+        return surveys.stream().map(this::mapToResultsDTO).collect(Collectors.toList());
+    }
+
+    // 7. UPDATE SURVEY
+    @Transactional
+    public SurveyResultsDTO updateSurvey(Long surveyId, CreateSurveyRequest request, Long crafterId) {
+        Survey survey = surveyRepository.findById(surveyId)
+                .orElseThrow(() -> new RuntimeException("Encuesta no encontrada"));
+
+        if (!survey.getCrafter().getUserId().equals(crafterId)) {
+            throw new RuntimeException("No tienes permiso para editar esta encuesta");
+        }
+
+        survey.setTitulo(request.getTitulo());
+        survey.setDescripcion(request.getDescripcion());
+        survey.setJuegoId(request.getJuegoId());
+        survey.setTipoEncuesta(request.getTipoEncuesta());
+
+        Survey updated = surveyRepository.save(survey);
+        return mapToResultsDTO(updated);
+    }
+
+    // 8. DELETE SURVEY
+    @Transactional
+    public void deleteSurvey(Long surveyId, Long userId) {
+        Survey survey = surveyRepository.findById(surveyId)
+                .orElseThrow(() -> new RuntimeException("Encuesta no encontrada"));
+
+        if (!survey.getCrafter().getUserId().equals(userId)) {
+            throw new RuntimeException("No tienes permiso para eliminar esta encuesta");
+        }
+
+        surveyRepository.delete(survey);
+    }
+
+    // 9. GET SURVEYS BY CREATOR
+    public List<SurveyResultsDTO> getSurveysByCreator(Long crafterId) {
+        List<Survey> surveys = surveyRepository.findByCrafter_UserId(crafterId);
+        return surveys.stream().map(this::mapToResultsDTO).collect(Collectors.toList());
+    }
+
+    // 10. CHANGE SURVEY STATUS
+    @Transactional
+    public SurveyResultsDTO changeSurveyStatus(Long surveyId, String newStatus, Long userId) {
+        Survey survey = surveyRepository.findById(surveyId)
+                .orElseThrow(() -> new RuntimeException("Encuesta no encontrada"));
+
+        if (!survey.getCrafter().getUserId().equals(userId)) {
+            throw new RuntimeException("No tienes permiso para modificar esta encuesta");
+        }
+
+        survey.setEstado(newStatus);
+        Survey updated = surveyRepository.save(survey);
+        return mapToResultsDTO(updated);
     }
 
     // === MAPPER PRIVADO ===
@@ -130,11 +188,11 @@ public class SurveyService {
         dto.setTitulo(survey.getTitulo());
         dto.setDescripcion(survey.getDescripcion());
         dto.setJuegoId(survey.getJuegoId());
-        dto.setEstado(survey.getEstado()); // Aseguramos mapear el estado también
+        dto.setEstado(survey.getEstado());
 
         long totalEncuesta = 0;
         List<SurveyResultsDTO.QuestionResultDTO> qDtos = new ArrayList<>();
-        
+
         if (survey.getQuestions() != null) {
             for (Question q : survey.getQuestions()) {
                 SurveyResultsDTO.QuestionResultDTO qDto = new SurveyResultsDTO.QuestionResultDTO();
@@ -151,8 +209,7 @@ public class SurveyService {
                         oDto.setOptionId(o.getOptionId());
                         oDto.setTextoOpcion(o.getOpcionTexto());
 
-                        // NECESITAS AGREGAR ESTE MÉTODO EN TU REPOSITORIO (VER ABAJO)
-                        long votos = responseRepository.countBySelectedOption(o); 
+                        long votos = responseRepository.countBySelectedOption(o);
                         oDto.setVotos(votos);
                         votosPregunta += votos;
                         oDtos.add(oDto);
@@ -169,7 +226,8 @@ public class SurveyService {
                 }
                 qDto.setOpciones(oDtos);
                 qDtos.add(qDto);
-                if (totalEncuesta == 0) totalEncuesta = votosPregunta;
+                if (totalEncuesta == 0)
+                    totalEncuesta = votosPregunta;
             }
         }
         dto.setTotalRespuestas(totalEncuesta);

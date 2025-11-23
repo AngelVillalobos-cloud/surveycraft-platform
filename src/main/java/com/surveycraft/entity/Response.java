@@ -1,8 +1,7 @@
 package com.surveycraft.entity;
 
-
-
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "responses")
@@ -31,17 +30,25 @@ public class Response {
     // SQL: CONSTRAINT fk_responses_option FOREIGN KEY (option_id)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "option_id")
-    private Option selectedOption; // En el servicio usamos .setSelectedOption(...)
+    private Option selectedOption;
 
     // --- Datos adicionales (Calidad de datos) ---
 
     // SQL: tiempo_jugado VARCHAR2(20)
     @Column(name = "tiempo_jugado", length = 20)
-    private String tiempoJugadoJuego; // En el servicio usamos .setTiempoJugadoJuego(...)
+    private String tiempoJugadoJuego;
 
     // SQL: plataforma_usada VARCHAR2(20)
     @Column(name = "plataforma_usada", length = 20)
     private String plataformaUsada;
+
+    // --- Big Data Analytics Fields ---
+
+    @Column(name = "submitted_at")
+    private LocalDateTime submittedAt;
+
+    @Column(name = "session_id", length = 50)
+    private String sessionId;
 
     // --- Constructores ---
 
@@ -96,5 +103,21 @@ public class Response {
 
     public void setPlataformaUsada(String plataformaUsada) {
         this.plataformaUsada = plataformaUsada;
+    }
+
+    public LocalDateTime getSubmittedAt() {
+        return submittedAt;
+    }
+
+    public void setSubmittedAt(LocalDateTime submittedAt) {
+        this.submittedAt = submittedAt;
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
 }

@@ -1,6 +1,5 @@
 package com.surveycraft.entity;
 
-
 import jakarta.persistence.*; // Si usas una versión vieja de Spring Boot, cambia a javax.persistence.*
 import java.util.ArrayList;
 import java.util.List;
@@ -14,10 +13,10 @@ public class Survey {
     @Column(name = "survey_id")
     private Long surveyId;
 
-    @Column(name = "titulo", length = 20, nullable = false)
+    @Column(name = "titulo", length = 100, nullable = false)
     private String titulo;
 
-    @Column(name = "descripcion", length = 50)
+    @Column(name = "descripcion", length = 255)
     private String descripcion;
 
     @Column(name = "estado", length = 20)
@@ -33,9 +32,10 @@ public class Survey {
 
     // --- Relaciones (Foreign Keys) ---
 
-    // SQL: CONSTRAINT fk_surveys_crafter FOREIGN KEY (crafter_id) REFERENCES usuarios(user_id)
+    // SQL: CONSTRAINT fk_surveys_crafter FOREIGN KEY (crafter_id) REFERENCES
+    // usuarios(user_id)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "crafter_id") 
+    @JoinColumn(name = "crafter_id")
     private User crafter;
 
     // Relación inversa con Questions (One Survey -> Many Questions)
@@ -112,10 +112,10 @@ public class Survey {
     public void setQuestions(List<Question> questions) {
         this.questions = questions;
     }
-    
+
     // Método de utilidad para el Controller (ya que borramos el campo de la DB)
     // Esto permite saber si es específica sin tener la columna en la tabla
     public Boolean getEsEspecificaJuego() {
-        return this.juegoId != null; 
+        return this.juegoId != null;
     }
 }
