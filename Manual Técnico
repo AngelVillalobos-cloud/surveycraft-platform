@@ -1,0 +1,112 @@
+# Manual Técnico - SurveyCraft Platform
+
+## 1. Introducción
+Este documento proporciona una visión técnica detallada de **SurveyCraft Platform**, una aplicación web diseñada para la gestión y participación en encuestas de videojuegos. El propósito de este manual es servir como guía para desarrolladores, arquitectos y administradores de sistemas encargados del mantenimiento, extensión y despliegue de la plataforma.
+
+## 2. Arquitectura del Sistema
+El sistema sigue una arquitectura **Cliente-Servidor** desacoplada, comunicándose a través de una API REST.
+
+*   **Frontend (Cliente)**: Aplicación de página única (SPA) construida con tecnologías web modernas. Se encarga de la interfaz de usuario y la interacción.
+*   **Backend (Servidor)**: Aplicación monolítica basada en Spring Boot que expone endpoints REST, gestiona la lógica de negocio y la persistencia de datos.
+*   **Patrón de Diseño**: El backend implementa el patrón **MVC (Modelo-Vista-Controlador)**, donde los Controladores manejan las peticiones HTTP, los Servicios contienen la lógica de negocio y los Repositorios interactúan con la base de datos.
+
+## 3. Stack Tecnológico
+
+### Backend
+*   **Lenguaje**: Java 17
+*   **Framework**: Spring Boot 3.2.5
+*   **Seguridad**: Spring Security 6 (con JWT)
+*   **Persistencia**: Spring Data JPA (Hibernate)
+*   **Gestión de Dependencias**: Maven
+
+### Frontend
+*   **Lenguaje**: JavaScript (ES6+)
+*   **Empaquetador**: Vite 5.2.0
+*   **Estilos**: CSS3 (Vanilla)
+*   **HTML**: HTML5
+
+### Base de Datos
+*   **Motor**: Oracle Database (19c/21c XE recomendado)
+*   **Driver**: `ojdbc11`
+
+## 4. Modelo de Datos (Entidades Principales)
+
+El sistema se basa en un modelo relacional. Las principales entidades son:
+
+*   **User**: Almacena las credenciales y datos de los usuarios.
+    *   Atributos: `userId`, `email`, `password` (hash), `username`, `role`.
+*   **Role**: Define los permisos del usuario (`ROLE_CRAFTER`, `ROLE_PLAYER`).
+*   **Survey**: Representa una encuesta creada por un Crafter.
+    *   Relaciones: Tiene muchas `Question`, pertenece a un `User` (creador), asociada a un `Game`.
+*   **Question**: Preguntas individuales dentro de una encuesta.
+    *   Relaciones: Tiene muchas `Option`.
+*   **Game**: Videojuegos sobre los que se realizan las encuestas.
+    *   Atributos: `titulo`, `categoria`.
+*   **Response**: Almacena las respuestas enviadas por los Players.
+
+## 5. API REST
+
+La comunicación se realiza a través de endpoints HTTP estandarizados.
+
+### Autenticación (`AuthController`)
+*   `POST /api/auth/register`: Registro de nuevos usuarios.
+*   `POST /api/auth/login`: Autenticación y obtención de Token JWT.
+
+### Usuarios (`UserController`)
+*   `GET /api/users/me`: Obtener perfil del usuario autenticado.
+
+### Encuestas (`SurveyController`)
+*   `POST /api/surveys`: Crear nueva encuesta (Requiere `ROLE_CRAFTER`).
+*   `GET /api/surveys`: Listar todas las encuestas públicas.
+*   `GET /api/surveys/my-surveys`: Listar encuestas del creador actual.
+*   `GET /api/surveys/{id}`: Obtener detalles de una encuesta.
+*   `PUT /api/surveys/{id}`: Actualizar encuesta.
+*   `DELETE /api/surveys/{id}`: Eliminar encuesta.
+*   `POST /api/surveys/{id}/respond`: Enviar respuesta (Requiere `ROLE_PLAYER`).
+*   `GET /api/surveys/{id}/results`: Ver estadísticas de respuestas.
+
+### Juegos (`GameController`)
+*   `POST /api/games`: Crear nuevo juego/categoría.
+*   `GET /api/games`: Listar juegos disponibles.
+
+## 6. Seguridad
+
+La seguridad se implementa mediante **Spring Security** con una arquitectura **Stateless** (sin estado).
+
+1.  **Autenticación**: El usuario envía sus credenciales (`email`, `password`). Si son correctas, el servidor genera un **JSON Web Token (JWT)** firmado.
+2.  **Autorización**: Para cada petición subsiguiente a recursos protegidos, el cliente debe enviar el JWT en el encabezado `Authorization: Bearer <token>`.
+3.  **Filtros**: Un filtro personalizado (`JwtAuthenticationFilter`) intercepta las peticiones, valida el token y establece el contexto de seguridad.
+
+## 7. Guía de Instalación y Despliegue
+
+### Requisitos Previos
+*   JDK 17 instalado.
+*   Node.js (v18+) y NPM instalados.
+*   Instancia de Oracle Database corriendo.
+
+### Configuración del Backend
+1.  Abrir `src/main/resources/application.properties`.
+2.  Configurar la conexión a la base de datos:
+    ```properties
+    spring.datasource.url=jdbc:oracle:thin:@localhost:1521/XEPDB1
+    spring.datasource.username=TU_USUARIO
+    spring.datasource.password=TU_CONTRASEÑA
+    ```
+
+### Ejecución
+1.  **Backend**:
+    ```bash
+    ./mvnw spring-boot:run
+    ```
+    El servicio estará disponible en `http://localhost:8080`.
+
+2.  **Frontend**:
+    ```bash
+    cd frontend
+    npm install
+    npm run dev
+    ```
+    La aplicación web estará disponible en `http://localhost:5173`.
+
+---
+*Documento generado para SurveyCraft Platform.*
