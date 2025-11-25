@@ -1,0 +1,185 @@
+# Manual de Usuario - SurveyCraft Platform
+
+  
+
+Bienvenido a **SurveyCraft**, la plataforma para crear y responder encuestas sobre videojuegos. Este manual te guiará paso a paso para utilizar todas las funcionalidades del sistema.
+
+  
+
+## Tabla de Contenidos
+
+1. [Acceso al Sistema](#acceso-al-sistema)
+
+2. [Guía para Creadores (Crafters)](#guía-para-creadores-crafters)
+
+3. [Guía para Jugadores (Players)](#guía-para-jugadores-players)
+
+  
+
+---
+
+  
+
+## Acceso al Sistema
+
+  
+
+### 1. Crear una Cuenta
+
+Si eres nuevo en la plataforma, sigue estos pasos:
+
+1. En la pantalla de bienvenida, haz clic en el enlace **"¿No tienes cuenta? Regístrate"**.
+
+2. Rellena el formulario con tus datos:
+
+*  **Correo electrónico**: Tu email personal.
+
+*  **Contraseña**: Una clave segura.
+
+*  **Nombre completo**: Tu nombre de usuario visible.
+
+*  **Rol**: Selecciona tu perfil:
+
+*  **Jugador**: Si solo quieres participar en encuestas.
+
+*  **Creador**: Si deseas diseñar y publicar tus propias encuestas.
+
+3. Haz clic en el botón **"Registrarse"**.
+
+4. Si el registro es exitoso, verás un mensaje de confirmación. Ahora puedes iniciar sesión.
+
+  
+
+### 2. Iniciar Sesión
+
+1. Ingresa tu **Correo electrónico** y **Contraseña** en el formulario principal.
+
+2. Haz clic en **"Iniciar Sesión"**.
+
+3. Accederás a tu panel principal.
+
+  
+
+---
+
+  
+
+## Guía para Creadores (Crafters)
+
+  
+
+Como Creador, tienes acceso a herramientas para gestionar tus encuestas y analizar resultados.
+
+  
+
+### Panel Principal
+
+Al entrar, verás dos pestañas en la parte superior:
+
+*  **Todas las Encuestas**: Muestra lo que otros han publicado.
+
+*  **Mis Encuestas**: Muestra solo las encuestas creadas por ti.
+
+  
+
+### Crear una Nueva Encuesta
+
+1. Haz clic en el botón **"Nueva Encuesta"**.
+
+2. Se abrirá una ventana emergente. Completa los campos:
+
+*  **Título**: El nombre de tu encuesta (ej. "Opiniones sobre Minecraft").
+
+*  **Descripción**: Explica brevemente el propósito.
+
+*  **Videojuego / Categoría**: Selecciona el juego asociado.
+
+*  **¿No encuentras el juego?** Haz clic en el botón **`+`** junto a la lista desplegable.
+
+* En la nueva ventana, ingresa el **Título del Juego**, **Descripción** y **Categoría** (ej. RPG, Shooter).
+
+* Haz clic en **"Guardar"** para añadirlo y seleccionarlo automáticamente.
+
+*  **Tipo de Encuesta**: Elige una categoría (Satisfacción, Reporte de Bugs, etc.).
+
+  
+
+### Agregar Preguntas
+
+1. En la sección de preguntas, verás una pregunta por defecto.
+
+2. Escribe tu pregunta en el campo **"¿Qué quieres preguntar?"**.
+
+3. Rellena las **4 Opciones** obligatorias.
+
+4. Para añadir más preguntas, haz clic en el botón **"+ Agregar Pregunta"**.
+
+5. Si deseas borrar una pregunta, usa el botón rojo **"Eliminar"** en la esquina de la pregunta.
+
+  
+
+### Guardar y Publicar
+
+* Una vez todo esté listo, haz clic en **"Guardar Encuesta"**.
+
+* Tu encuesta aparecerá inmediatamente en la lista "Mis Encuestas" y estará visible para los jugadores.
+
+  
+
+### Editar o Eliminar Encuestas
+
+Ve a la pestaña **"Mis Encuestas"**:
+
+*  **Editar**: Haz clic en el botón gris **"Editar"** en la tarjeta de la encuesta. Podrás modificar textos y preguntas.
+
+*  **Eliminar**: Haz clic en el botón rojo **"Eliminar"**. **Cuidado**: Esta acción no se puede deshacer.
+
+  
+
+---
+
+  
+
+## Guía para Jugadores (Players)
+
+  
+
+Como Jugador, tu opinión ayuda a mejorar los videojuegos.
+
+  
+
+### Explorar Encuestas
+
+En tu panel principal verás la lista de **"Encuestas Disponibles"**. Cada tarjeta muestra:
+
+* Título y Descripción.
+
+* Juego asociado y Categoría.
+
+* Número total de respuestas actuales.
+
+  
+
+### Responder una Encuesta
+
+1. Haz clic en el botón azul **"Responder"** en la tarjeta de la encuesta que te interese.
+
+2. Se abrirá el formulario de respuesta.
+
+3.  **Datos de Perfil**: Antes de las preguntas, selecciona:
+
+*  **Tiempo Jugado**: Cuántas horas has dedicado al juego.
+
+*  **Plataforma**: Dónde juegas (PC, Xbox, PlayStation, etc.).
+
+4.  **Preguntas**: Selecciona una opción para cada pregunta presentada.
+
+5. Haz clic en **"Enviar Respuesta"**.
+
+6. Recibirás una confirmación y tu respuesta se sumará al total.
+
+  
+
+---
+
+*SurveyCraft Platform v1.0*
