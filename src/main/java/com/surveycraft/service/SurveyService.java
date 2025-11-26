@@ -26,6 +26,8 @@ public class SurveyService {
     private ResponseRepository responseRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private VideojuegoRepository videojuegoRepository;
 
     // 1. CREAR ENCUESTA
     @Transactional
@@ -190,6 +192,15 @@ public class SurveyService {
         dto.setJuegoId(survey.getJuegoId());
         dto.setEstado(survey.getEstado());
 
+        if (survey.getJuegoId() != null) {
+            String juegoNombre = videojuegoRepository.findById(survey.getJuegoId())
+                .map(videojuego -> videojuego.getTitulo())
+                .orElse("Juego no encontrado");
+            dto.setJuegoNombre(juegoNombre);
+        } else {
+            dto.setJuegoNombre("Sin juego");
+        }
+        
         long totalEncuesta = 0;
         List<SurveyResultsDTO.QuestionResultDTO> qDtos = new ArrayList<>();
 

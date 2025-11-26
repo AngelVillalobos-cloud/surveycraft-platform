@@ -20,6 +20,8 @@ public class SurveyResultsDTO {
     // Necesitas declarar esta variable para que el get/set funcionen
     private String estado; 
     // -----------------------------
+    
+    private String juegoNombre;
 
     // Datos globales de participación
     private long totalRespuestas; 
@@ -52,6 +54,10 @@ public class SurveyResultsDTO {
     public List<QuestionResultDTO> getPreguntas() { return preguntas; }
     public void setPreguntas(List<QuestionResultDTO> preguntas) { this.preguntas = preguntas; }
 
+    // Getters para nombre
+    public String getJuegoNombre() { return juegoNombre; }
+    public void setJuegoNombre(String juegoNombre) { this.juegoNombre = juegoNombre; }
+    
     // --- Clases internas estáticas ---
 
     public static class QuestionResultDTO {

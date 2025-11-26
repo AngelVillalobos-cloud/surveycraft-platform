@@ -51,11 +51,11 @@ public class GameDTO {
         this.categoriaId = categoriaId;
     }
 
-    public String getNombreCategoria() {
+    public String getCategoriaNombre() {
         return categoriaNombre;
     }
 
-    public void setNombreCategoria(String categoriaNombre) {
+    public void setCategoriaNombre(String categoriaNombre) {
         this.categoriaNombre = categoriaNombre;
     }
 }

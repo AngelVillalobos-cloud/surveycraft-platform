@@ -200,7 +200,9 @@ function setupEventListeners() {
         const term = e.target.value.toLowerCase();
         const filtered = allSurveys.filter(s =>
                 (s.titulo && s.titulo.toLowerCase().includes(term)) ||
-                (s.descripcion && s.descripcion.toLowerCase().includes(term))
+                (s.descripcion && s.descripcion.toLowerCase().includes(term)) ||
+				(s.juegoNombre && s.juegoNombre.toLowerCase().includes(term)) ||
+				(s.categoriaNombre && s.categoriaNombre.toLowerCase().includes(term))
             // Podríamos filtrar también por nombre de juego si viniera en el DTO
         );
         const isMine = document.getElementById('tab-mine').classList.contains('active');
@@ -278,10 +280,11 @@ function displaySurveys(surveys, isMyList) {
       <div style="flex: 1;">
         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
             <span style="background: #00b894; color: white; padding: 2px 10px; border-radius: 20px; font-size: 0.7rem; font-weight:bold;">${survey.estado || 'ACTIVA'}</span>
-            </div>
+            <span style="background: #6c5ce7; color: white; padding: 2px 10px; border-radius: 20px; font-size: 0.7rem; font-weight:bold;">${survey.juegoNombre || 'Sin juego'}</span>
+        </div>
         <h3 style="margin: 0; color: white; font-size: 1.4rem;">${survey.titulo}</h3>
         <p style="margin: 5px 0 0 0; color: rgba(255,255,255,0.7); font-size: 0.95rem;">${survey.descripcion || 'Sin descripción'}</p>
-        <small style="color: #a29bfe;">${survey.totalRespuestas || 0} respuestas</small>
+        <small style="color: #a29bfe;">${survey.totalRespuestas || 0} respuestas • Juego: ${survey.juegoNombre || 'No especificado'}</small>
       </div>
       <div style="display: flex; align-items: center;">
         ${buttonsHtml}
@@ -324,7 +327,7 @@ async function loadGamesForSelect() {
             if(games.length === 0) {
                 select.innerHTML = '<option value="">No hay juegos. ¡Crea uno!</option>';
             } else {
-                select.innerHTML = games.map(g => `<option value="${g.id}">${g.titulo} (${g.nombreCategoria})</option>`).join('');
+                select.innerHTML = games.map(g => `<option value="${g.id}">${g.titulo} (${g.categoriaNombre})</option>`).join('');
             }
         }
     } catch(e) { console.error(e); select.innerHTML='<option>Error al cargar</option>'; }
@@ -341,7 +344,7 @@ window.createNewGameQuick = async function() {
         const res = await fetch(`${API_URL}/games`, {
             method: 'POST',
             headers: {'Content-Type':'application/json','Authorization':`Bearer ${localStorage.getItem('token')}`},
-            body: JSON.stringify({ titulo: titulo, descripcion: "Creado desde encuesta", categoriaNombre: cat })
+            body: JSON.stringify({ titulo: titulo, descripcion: "Creado desde encuesta", nombreCategoria: cat })
         });
         if(res.ok) {
             alert("Juego creado. Seleccionándolo...");

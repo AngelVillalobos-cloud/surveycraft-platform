@@ -27,8 +27,8 @@ public class GameService {
         if (gameDTO.getCategoriaId() != null) {
             category = categoryRepository.findById(gameDTO.getCategoriaId())
                     .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
-        } else if (gameDTO.getNombreCategoria() != null && !gameDTO.getNombreCategoria().isEmpty()) {
-            String catName = gameDTO.getNombreCategoria().trim();
+        } else if (gameDTO.getCategoriaNombre() != null && !gameDTO.getCategoriaNombre().isEmpty()) {
+            String catName = gameDTO.getCategoriaNombre().trim();
             category = categoryRepository.findByNombreCategoria(catName)
                     .orElseGet(() -> {
                         Category newCat = new Category();
@@ -83,7 +83,7 @@ public class GameService {
     private GameDTO mapEntityToDTO(Videojuego game) {
         GameDTO dto = new GameDTO();
         dto.setId(game.getId());
-        dto.setNombreCategoria(game.getCategoria().getNombreCategoria());
+        dto.setCategoriaNombre(game.getCategoria().getNombreCategoria());
         dto.setTitulo(game.getTitulo());
         dto.setDescripcion(game.getDescripcion());
         dto.setCategoriaId(game.getCategoria().getId());
