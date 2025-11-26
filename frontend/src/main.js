@@ -1,586 +1,252 @@
-const API_URL = '/api';
-let token = localStorage.getItem('token');
-let userRole = localStorage.getItem('role');
+import './style.css';
 
-// DOM Elements
-const app = document.getElementById('app');
-const authContainer = document.getElementById('auth-container');
-const dashboardContainer = document.getElementById('dashboard-container');
-const authForm = document.getElementById('auth-form');
-const authTitle = document.getElementById('auth-title');
-const toggleAuthBtn = document.getElementById('toggle-auth');
-const registerFields = document.getElementById('register-fields');
-const submitBtn = document.getElementById('submit-btn');
-const logoutBtn = document.getElementById('logout-btn');
-const surveysList = document.getElementById('surveys-list');
-const createSurveyBtn = document.getElementById('create-survey-btn');
-const crafterActions = document.getElementById('crafter-actions');
-const crafterTabs = document.getElementById('crafter-tabs');
-const listTitle = document.getElementById('list-title');
+const API_URL = 'http://localhost:8080/api';
+let currentUser = null;
 
-// Create/Edit Modal Elements
-const createSurveyModal = document.getElementById('create-survey-modal');
-const modalFormTitle = document.getElementById('modal-form-title');
-const newSurveyTitle = document.getElementById('new-survey-title');
-const newSurveyDesc = document.getElementById('new-survey-desc');
-const newSurveyGame = document.getElementById('new-survey-game');
-const newSurveyType = document.getElementById('new-survey-type');
-const questionsContainer = document.getElementById('questions-container');
-const addQuestionBtn = document.getElementById('add-question-btn');
-const cancelCreateBtn = document.getElementById('cancel-create-btn');
-const saveSurveyBtn = document.getElementById('save-survey-btn');
+// Render the app
+function renderApp() {
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <!-- Auth Section -->
+    <section id="auth-section">
+      <div id="login-container" class="auth-container">
+        <div class="auth-card">
+          <img src="/logo.svg" alt="SurveyCraft Logo" style="width: 100px; height: 100px; margin: 0 auto 2rem;">
+          <h1>SurveyCraft</h1>
+          <p class="subtitle">Plataforma de Encuestas Gaming</p>
+          
+          <form id="login-form">
+            <div class="form-group">
+              <label for="login-email">📧 Email</label>
+              <input type="email" id="login-email" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="login-password">🔒 Contraseña</label>
+              <input type="password" id="login-password" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Iniciar Sesión</button>
+          </form>
+          
+          <p class="auth-link">
+            ¿No tienes cuenta? <a href="#" id="show-register-link">Regístrate</a>
+          </p>
+        </div>
+      </div>
 
-// Response Modal Elements
-const responseModal = document.getElementById('response-modal');
-const modalTitle = document.getElementById('modal-title');
-const modalQuestions = document.getElementById('modal-questions');
-const closeModalBtn = document.getElementById('close-modal-btn');
-const submitResponseBtn = document.getElementById('submit-response-btn');
-const respTime = document.getElementById('resp-time');
-const respPlatform = document.getElementById('resp-platform');
+      <div id="register-container" class="auth-container hidden">
+        <div class="auth-card">
+          <img src="/logo.svg" alt="SurveyCraft Logo" style="width: 100px; height: 100px; margin: 0 auto 2rem;">
+          <h1>Crear Cuenta</h1>
+          <p class="subtitle">Únete a la comunidad</p>
+          
+          <form id="register-form">
+            <div class="form-group">
+              <label for="register-name">👤 Nombre</label>
+              <input type="text" id="register-name" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="register-email">📧 Email</label>
+              <input type="email" id="register-email" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="register-password">🔒 Contraseña</label>
+              <input type="password" id="register-password" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="register-role">🎭 Rol</label>
+              <select id="register-role" required>
+                <option value="">Selecciona un rol</option>
+                <option value="PLAYER">🎮 Jugador</option>
+                <option value="CRAFTER">🔨 Creador de Encuestas</option>
+              </select>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Registrarse</button>
+          </form>
+          
+          <p class="auth-link">
+            ¿Ya tienes cuenta? <a href="#" id="show-login-link">Inicia Sesión</a>
+          </p>
+        </div>
+      </div>
+    </section>
 
-// Create Game Modal Elements
-const openCreateGameBtn = document.getElementById('open-create-game-btn');
-const createGameModal = document.getElementById('create-game-modal');
-const newGameTitle = document.getElementById('new-game-title');
-const newGameDesc = document.getElementById('new-game-desc');
-const newGameCategory = document.getElementById('new-game-category');
-const cancelCreateGameBtn = document.getElementById('cancel-create-game-btn');
-const saveGameBtn = document.getElementById('save-game-btn');
+    <section id="dashboard-section" class="hidden">
+      <nav class="navbar">
+        <div class="navbar-brand">
+          <img src="/logo.svg" alt="SurveyCraft" class="logo-icon">
+          <span>SurveyCraft</span>
+        </div>
+        <div class="navbar-user">
+          <span>👤 <span id="user-name"></span></span>
+          <button id="logout-btn" class="btn btn-secondary">Cerrar Sesión</button>
+        </div>
+      </nav>
 
-let isRegistering = false;
-let currentSurveyId = null;
-let currentEditId = null; // If editing
-let currentTab = 'all'; // 'all' or 'mine'
+      <main class="container">
+        <div class="header">
+          <h2>📊 Mis Encuestas</h2>
+        </div>
+        <div id="surveys-container" class="surveys-grid">
+          <p class="loading">Cargando encuestas...</p>
+        </div>
+      </main>
+    </section>
+  `;
+  
+  setupEventListeners();
+  checkAuth();
+}
 
-// Init
-function init() {
-  if (token) {
+function setupEventListeners() {
+  const loginForm = document.getElementById('login-form');
+  if (loginForm) loginForm.addEventListener('submit', handleLogin);
+  
+  const registerForm = document.getElementById('register-form');
+  if (registerForm) registerForm.addEventListener('submit', handleRegister);
+  
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
+  
+  const showRegisterLink = document.getElementById('show-register-link');
+  if (showRegisterLink) showRegisterLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    showRegister();
+  });
+  
+  const showLoginLink = document.getElementById('show-login-link');
+  if (showLoginLink) showLoginLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    showLogin();
+  });
+}
+
+function checkAuth() {
+  const token = localStorage.getItem('token');
+  const user = localStorage.getItem('user');
+  
+  if (token && user) {
+    currentUser = JSON.parse(user);
     showDashboard();
   } else {
-    showAuth();
+    showLogin();
   }
 }
 
-// Toggle Login/Register
-toggleAuthBtn.addEventListener('click', (e) => {
-  e.preventDefault();
-  isRegistering = !isRegistering;
-  if (isRegistering) {
-    authTitle.textContent = 'Crear Cuenta';
-    submitBtn.textContent = 'Registrarse';
-    toggleAuthBtn.textContent = '¿Ya tienes cuenta? Inicia Sesión';
-    registerFields.classList.remove('hidden');
-  } else {
-    authTitle.textContent = 'Bienvenido';
-    submitBtn.textContent = 'Iniciar Sesión';
-    toggleAuthBtn.textContent = '¿No tienes cuenta? Regístrate';
-    registerFields.classList.add('hidden');
-  }
-});
+function showLogin() {
+  document.getElementById('auth-section').classList.remove('hidden');
+  document.getElementById('dashboard-section').classList.add('hidden');
+  document.getElementById('login-container').classList.remove('hidden');
+  document.getElementById('register-container').classList.add('hidden');
+}
 
-// Handle Auth Submit
-authForm.addEventListener('submit', async (e) => {
+function showRegister() {
+  document.getElementById('login-container').classList.add('hidden');
+  document.getElementById('register-container').classList.remove('hidden');
+}
+
+function showDashboard() {
+  document.getElementById('auth-section').classList.add('hidden');
+  document.getElementById('dashboard-section').classList.remove('hidden');
+  document.getElementById('user-name').textContent = currentUser.nombre;
+  loadSurveys();
+}
+
+async function handleLogin(e) {
   e.preventDefault();
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
 
   try {
-    if (isRegistering) {
-      const name = document.getElementById('name').value;
-      const role = document.getElementById('role').value;
+    const response = await fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
 
-      const res = await fetch(`${API_URL}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, username: name, role })
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Error en el registro');
-      }
-
-      alert('Registro exitoso. Por favor inicia sesión.');
-      isRegistering = false;
-      toggleAuthBtn.click();
-    } else {
-      const res = await fetch(`${API_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-
-      if (!res.ok) throw new Error('Credenciales inválidas');
-
-      const data = await res.json();
-      token = data.token;
-      userRole = data.role;
-      localStorage.setItem('token', token);
-      localStorage.setItem('role', userRole);
+    if (response.ok) {
+      const data = await response.json();
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      currentUser = data.user;
       showDashboard();
+    } else {
+      alert('❌ Error al iniciar sesión');
     }
-  } catch (err) {
-    alert(err.message);
-  }
-});
-
-// Logout
-logoutBtn.addEventListener('click', () => {
-  token = null;
-  userRole = null;
-  localStorage.clear();
-  showAuth();
-});
-
-// Show Auth
-function showAuth() {
-  authContainer.classList.remove('hidden');
-  dashboardContainer.classList.add('hidden');
-}
-
-// Show Dashboard
-async function showDashboard() {
-  authContainer.classList.add('hidden');
-  dashboardContainer.classList.remove('hidden');
-
-  if (userRole === 'ROLE_CRAFTER') {
-    crafterActions.classList.remove('hidden');
-    crafterTabs.classList.remove('hidden');
-    loadMySurveys(); // Default for crafter? Or all? Let's stick to 'all' first
-    switchTab('all');
-  } else {
-    crafterActions.classList.add('hidden');
-    crafterTabs.classList.add('hidden');
-    loadSurveys();
+  } catch (error) {
+    console.error('Error:', error);
+    alert('❌ Error de conexión');
   }
 }
 
-// Tab Switching
-crafterTabs.addEventListener('click', (e) => {
-  if (e.target.classList.contains('tab')) {
-    const tab = e.target.dataset.tab;
-    switchTab(tab);
-  }
-});
+async function handleRegister(e) {
+  e.preventDefault();
+  const nombre = document.getElementById('register-name').value;
+  const email = document.getElementById('register-email').value;
+  const password = document.getElementById('register-password').value;
+  const role = document.getElementById('register-role').value;
 
-function switchTab(tab) {
-  currentTab = tab;
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelector(`.tab[data-tab="${tab}"]`).classList.add('active');
+  try {
+    const response = await fetch(`${API_URL}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nombre, email, password, role })
+    });
 
-  if (tab === 'all') {
-    listTitle.textContent = 'Encuestas Disponibles';
-    loadSurveys();
-  } else {
-    listTitle.textContent = 'Mis Encuestas';
-    loadMySurveys();
+    if (response.ok) {
+      alert('✅ Registro exitoso');
+      showLogin();
+    } else {
+      alert('❌ Error al registrarse');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('❌ Error de conexión');
   }
 }
 
-// Load All Surveys
+function handleLogout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  currentUser = null;
+  showLogin();
+}
+
 async function loadSurveys() {
-  surveysList.innerHTML = '<div class="spinner"></div>';
   try {
-    const res = await fetch(`${API_URL}/surveys`, {
-      headers: { 'Authorization': `Bearer ${token}` }
+    const response = await fetch(`${API_URL}/surveys`, {
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     });
-    if (!res.ok) throw new Error('Error cargando encuestas');
-    const surveys = await res.json();
-    renderSurveys(surveys, false);
-  } catch (err) {
-    surveysList.innerHTML = '<p>Error al cargar encuestas.</p>';
+
+    if (response.ok) {
+      const surveys = await response.json();
+      displaySurveys(surveys);
+    }
+  } catch (error) {
+    console.error('Error:', error);
   }
 }
 
-// Load My Surveys
-async function loadMySurveys() {
-  surveysList.innerHTML = '<div class="spinner"></div>';
-  try {
-    const res = await fetch(`${API_URL}/surveys/my-surveys`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (!res.ok) throw new Error('Error cargando mis encuestas');
-    const surveys = await res.json();
-    renderSurveys(surveys, true);
-  } catch (err) {
-    surveysList.innerHTML = '<p>Error al cargar mis encuestas.</p>';
-  }
-}
-
-// Render Surveys
-function renderSurveys(surveys, isMine) {
+function displaySurveys(surveys) {
+  const container = document.getElementById('surveys-container');
+  
   if (surveys.length === 0) {
-    surveysList.innerHTML = '<p>No hay encuestas disponibles.</p>';
+    container.innerHTML = '<p class="no-data">No hay encuestas disponibles</p>';
     return;
   }
 
-  surveysList.innerHTML = surveys.map(s => `
-    <div class="survey-card glass-card">
-      <div class="survey-meta mb-2">
-        <span class="badge badge-info">${s.juegoId || 'General'}</span>
-        <span class="badge badge-success">${s.estado || 'Activa'}</span>
-      </div>
-      <h4>${s.titulo || 'Sin título'}</h4>
-      <p>${s.description || 'Sin descripción'}</p>
-      <div class="mt-3 flex justify-between items-center">
-        <span class="text-muted text-sm">${s.totalRespuestas || 0} respuestas</span>
-        <div class="flex gap-sm">
-          ${isMine ? `
-            <button onclick="window.editSurvey(${s.surveyId})" class="btn btn-secondary btn-sm">Editar</button>
-            <button onclick="window.deleteSurvey(${s.surveyId})" class="btn btn-danger btn-sm">Eliminar</button>
-          ` : `
-            <button onclick="window.openResponseModal(${s.surveyId})" class="btn btn-primary btn-sm">Responder</button>
-          `}
-        </div>
-      </div>
+  container.innerHTML = surveys.map(survey => `
+    <div class="survey-card">
+      <h4>${survey.titulo}</h4>
+      <p>${survey.descripcion || 'Sin descripción'}</p>
     </div>
   `).join('');
 }
 
-// Load Categories
-async function loadCategories() {
-  try {
-    const res = await fetch(`${API_URL}/games`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (res.ok) {
-      const games = await res.json();
-      newSurveyGame.innerHTML = games.map(g =>
-        `<option value="${g.id}">${g.titulo} (${g.nombreCategoria})</option>`
-      ).join('');
-    }
-  } catch (err) {
-    console.error('Error loading games', err);
-    newSurveyGame.innerHTML = '<option value="">Error cargando juegos</option>';
-  }
-}
-
-// Open Create Modal
-createSurveyBtn.addEventListener('click', () => {
-  currentEditId = null;
-  modalFormTitle.textContent = 'Crear Nueva Encuesta';
-  saveSurveyBtn.textContent = 'Guardar Encuesta';
-
-  newSurveyTitle.value = '';
-  newSurveyDesc.value = '';
-  questionsContainer.innerHTML = '';
-  addQuestion(1);
-  loadCategories();
-
-  createSurveyModal.classList.remove('hidden');
-});
-
-// Edit Survey
-window.editSurvey = async (id) => {
-  currentEditId = id;
-  modalFormTitle.textContent = 'Editar Encuesta';
-  saveSurveyBtn.textContent = 'Actualizar Encuesta';
-
-  try {
-    const res = await fetch(`${API_URL}/surveys/${id}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (!res.ok) throw new Error('Error cargando encuesta');
-
-    const survey = await res.json();
-    newSurveyTitle.value = survey.titulo;
-    newSurveyDesc.value = survey.descripcion;
-
-    await loadCategories();
-    newSurveyGame.value = survey.juegoId;
-    // Note: Type might not be in DTO, assuming default or need to fetch
-
-    questionsContainer.innerHTML = '';
-    if (survey.preguntas && survey.preguntas.length > 0) {
-      survey.preguntas.forEach((q, idx) => {
-        addQuestion(idx + 1, q);
-      });
-    } else {
-      addQuestion(1);
-    }
-
-    createSurveyModal.classList.remove('hidden');
-  } catch (err) {
-    alert(err.message);
-  }
-};
-
-// Delete Survey
-window.deleteSurvey = async (id) => {
-  if (!confirm('¿Estás seguro de eliminar esta encuesta?')) return;
-
-  try {
-    const res = await fetch(`${API_URL}/surveys/${id}`, {
-      method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-
-    if (!res.ok) throw new Error('Error al eliminar');
-
-    loadMySurveys();
-  } catch (err) {
-    alert(err.message);
-  }
-};
-
-// Close Create Modal
-cancelCreateBtn.addEventListener('click', () => {
-  createSurveyModal.classList.add('hidden');
-});
-
-// Add Question Logic
-function addQuestion(index, data = null) {
-  const qDiv = document.createElement('div');
-  qDiv.className = 'question-item';
-
-  const qText = data ? data.textoPregunta : '';
-  const opts = data && data.opciones ? data.opciones.map(o => o.textoOpcion) : ['', '', '', ''];
-
-  qDiv.innerHTML = `
-    <div class="question-header">
-      <strong>Pregunta ${index}</strong>
-      <button class="remove-q-btn btn btn-danger btn-sm">Eliminar</button>
-    </div>
-    <input type="text" class="q-text mb-2" placeholder="¿Qué quieres preguntar?" value="${qText}">
-    
-    <div class="grid-2">
-      <input type="text" class="opt-1" placeholder="Opción 1" value="${opts[0] || ''}" required>
-      <input type="text" class="opt-2" placeholder="Opción 2" value="${opts[1] || ''}" required>
-      <input type="text" class="opt-3" placeholder="Opción 3" value="${opts[2] || ''}" required>
-      <input type="text" class="opt-4" placeholder="Opción 4" value="${opts[3] || ''}" required>
-    </div>
-  `;
-
-  qDiv.querySelector('.remove-q-btn').addEventListener('click', () => qDiv.remove());
-  questionsContainer.appendChild(qDiv);
-}
-
-addQuestionBtn.addEventListener('click', () => {
-  const count = questionsContainer.children.length + 1;
-  addQuestion(count);
-});
-
-// Save Survey Logic
-saveSurveyBtn.addEventListener('click', async () => {
-  const title = newSurveyTitle.value;
-  const desc = newSurveyDesc.value;
-  const gameId = newSurveyGame.value;
-  const type = newSurveyType.value;
-
-  if (!title || !gameId) {
-    alert('Título y Juego son obligatorios');
-    return;
-  }
-
-  const questions = [];
-  const qItems = questionsContainer.querySelectorAll('.question-item');
-
-  for (const item of qItems) {
-    const text = item.querySelector('.q-text').value;
-    const opt1 = item.querySelector('.opt-1').value;
-    const opt2 = item.querySelector('.opt-2').value;
-    const opt3 = item.querySelector('.opt-3').value;
-    const opt4 = item.querySelector('.opt-4').value;
-
-    if (!text || !opt1 || !opt2 || !opt3 || !opt4) {
-      alert('Completa todas las preguntas y opciones');
-      return;
-    }
-
-    questions.push({
-      texto: text,
-      tipoPregunta: 'SINGLE_CHOICE',
-      opciones: [opt1, opt2, opt3, opt4]
-    });
-  }
-
-  if (questions.length === 0) {
-    alert('Agrega al menos una pregunta');
-    return;
-  }
-
-  const payload = {
-    titulo: title,
-    descripcion: desc,
-    juegoId: parseInt(gameId),
-    tipoEncuesta: type,
-    preguntas: questions
-  };
-
-  try {
-    const url = currentEditId ? `${API_URL}/surveys/${currentEditId}` : `${API_URL}/surveys`;
-    const method = currentEditId ? 'PUT' : 'POST';
-
-    const res = await fetch(url, {
-      method: method,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(payload)
-    });
-
-    if (!res.ok) throw new Error('Error al guardar');
-
-    alert(currentEditId ? 'Encuesta actualizada' : 'Encuesta creada');
-    createSurveyModal.classList.add('hidden');
-
-    if (currentTab === 'mine') loadMySurveys();
-    else loadSurveys();
-
-  } catch (err) {
-    alert(err.message);
-  }
-});
-
-// Response Modal Logic
-closeModalBtn.addEventListener('click', () => {
-  responseModal.classList.add('hidden');
-});
-
-window.openResponseModal = async (surveyId) => {
-  currentSurveyId = surveyId;
-  responseModal.classList.remove('hidden');
-  modalQuestions.innerHTML = '<div class="spinner"></div>';
-
-  try {
-    const res = await fetch(`${API_URL}/surveys/${surveyId}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-
-    if (!res.ok) throw new Error('Error cargando encuesta');
-
-    const survey = await res.json();
-    modalTitle.textContent = survey.titulo;
-
-    if (!survey.preguntas || survey.preguntas.length === 0) {
-      modalQuestions.innerHTML = '<p>Sin preguntas.</p>';
-      return;
-    }
-
-    modalQuestions.innerHTML = survey.preguntas.map(q => `
-      <div class="question-block glass-card p-3 mb-3">
-        <p class="font-bold mb-2">${q.textoPregunta}</p>
-        <div class="grid-2">
-          ${q.opciones.map(opt => `
-            <label class="flex items-center gap-sm cursor-pointer p-2 rounded hover:bg-white/10">
-              <input type="radio" name="q-${q.questionId}" value="${opt.optionId}">
-              <span>${opt.textoOpcion}</span>
-            </label>
-          `).join('')}
-        </div>
-      </div>
-    `).join('');
-
-  } catch (err) {
-    modalQuestions.innerHTML = '<p>Error cargando detalles.</p>';
-  }
-};
-
-// Submit Response
-submitResponseBtn.addEventListener('click', async () => {
-  if (!currentSurveyId) return;
-
-  const answers = [];
-  const questionBlocks = modalQuestions.querySelectorAll('.question-block');
-
-  for (const block of questionBlocks) {
-    const radio = block.querySelector('input[type="radio"]:checked');
-    if (radio) {
-      const questionId = radio.name.replace('q-', '');
-      answers.push({
-        questionId: parseInt(questionId),
-        optionId: parseInt(radio.value)
-      });
-    }
-  }
-
-  if (answers.length === 0) {
-    alert('Responde al menos una pregunta');
-    return;
-  }
-
-  try {
-    const res = await fetch(`${API_URL}/surveys/${currentSurveyId}/respond`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        tiempoJugadoJuego: respTime.value,
-        plataformaUsada: respPlatform.value,
-        respuestas: answers
-      })
-    });
-
-    if (!res.ok) throw new Error('Error enviando respuesta');
-
-    alert('Respuesta enviada con éxito!');
-    responseModal.classList.add('hidden');
-    loadSurveys(); // Refresh stats if needed
-  } catch (err) {
-    alert(err.message);
-  }
-});
-
-// Create Game Logic
-if (openCreateGameBtn) {
-  openCreateGameBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    newGameTitle.value = '';
-    newGameDesc.value = '';
-    newGameCategory.value = '';
-    createGameModal.classList.remove('hidden');
-  });
-}
-
-if (cancelCreateGameBtn) {
-  cancelCreateGameBtn.addEventListener('click', () => {
-    createGameModal.classList.add('hidden');
-  });
-}
-
-if (saveGameBtn) {
-  saveGameBtn.addEventListener('click', async () => {
-    const title = newGameTitle.value;
-    const desc = newGameDesc.value;
-    const category = newGameCategory.value;
-
-    if (!title || !category) {
-      alert('Título y Categoría son obligatorios');
-      return;
-    }
-
-    try {
-      const res = await fetch(`${API_URL}/games`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          titulo: title,
-          descripcion: desc,
-          categoriaNombre: category
-        })
-      });
-
-      if (!res.ok) throw new Error('Error al crear el juego');
-
-      const newGame = await res.json();
-      alert(`Juego "${newGame.titulo}" creado en categoría "${newGame.nombreCategoria}"`);
-      createGameModal.classList.add('hidden');
-
-      // Reload games and select the new one
-      await loadCategories();
-      newSurveyGame.value = newGame.id;
-
-    } catch (err) {
-      alert(err.message);
-    }
-  });
-}
-
-init();
+// Initialize
+document.addEventListener('DOMContentLoaded', renderApp);
