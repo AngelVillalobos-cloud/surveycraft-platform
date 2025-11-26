@@ -32,23 +32,18 @@ public class AuthService {
 
     // LÓGICA DE REGISTRO
     public void register(RegisterRequest request) {
-        // 1. Validar si ya existe
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("El email ya está registrado");
         }
 
-        // 2. Buscar el rol (El frontend manda "CRAFTER", buscamos "ROLE_CRAFTER")
-        // Asegúrate que en tu BD los roles se llamen "ROLE_CRAFTER" y "ROLE_PLAYER"
         String nombreRol = "ROLE_" + request.getRole().toUpperCase();
         Role role = roleRepository.findByNombre(nombreRol)
                 .orElseThrow(() -> new RuntimeException("Rol no encontrado: " + nombreRol));
 
-        // 3. Crear el usuario
         User user = new User();
-        user.setUsername(request.getUsername());
+        user.setUsername(request.getUsername()); // Guardamos el nombre real
         user.setEmail(request.getEmail());
         user.setRole(role);
-        // ¡IMPORTANTE! Encriptar la contraseña antes de guardar
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         userRepository.save(user);
@@ -56,22 +51,29 @@ public class AuthService {
 
     // LÓGICA DE LOGIN
     public java.util.Map<String, String> login(LoginRequest request) {
-        // 1. Autenticar usando el Manager de Spring (esto verifica el password
-        // automáticamente)
+        // 1. Autenticar
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
-        // 2. Obtener el usuario para saber su rol
+        // 2. Obtener usuario
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // 3. Generar respuesta
-        // Token formato: "userId:ROLE_NAME"
+        // 3. Generar token
         String token = user.getUserId() + ":" + user.getRole().getNombre();
 
+        // 4. VALIDACIÓN DE SEGURIDAD PARA EVITAR EL ERROR NULL
+        // Si el username es null en la BD, usamos el email o "Sin Nombre" para que no explote Map.of
+        String nombreSeguro = user.getUsername();
+        if (nombreSeguro == null) {
+            nombreSeguro = "Usuario"; 
+        }
+
+        // 5. Retornar respuesta blindada
         return java.util.Map.of(
                 "token", token,
-                "role", user.getRole().getNombre() // Ej: ROLE_CRAFTER
+                "role", user.getRole().getNombre(),
+                "username", nombreSeguro 
         );
     }
 }
