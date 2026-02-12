@@ -1,0 +1,175 @@
+# SurveyCraft Gaming Platform - Documentación Completa
+
+## INFORMACIÓN GENERAL
+**Nombre:** SurveyCraft Gaming Platform
+**Descripción:** Plataforma web de encuestas sobre videojuegos con roles separados (Crafters y Players)
+**Objetivo:** Sistema web para creación, respuesta y análisis de encuestas gaming con gamificación
+
+## ARQUITECTURA TÉCNICA
+**Frontend:** HTML5, CSS3, JavaScript, Bootstrap 5.3, Chart.js, Thymeleaf
+**Backend:** Spring Boot 3.1, Spring Security, Spring Data JPA
+**Base de Datos:** Oracle SQL
+**Herramientas:** IntelliJ, Git/GitHub, Postman
+
+## MODELO DE BASE DE DATOS
+### Tablas Principales:
+- usuarios (user_id, username, email, password_hash, role_id)
+- roles (role_id, nombre, descripcion)
+- surveys (survey_id, titulo, descripcion, crafter_id, estado)
+- questions (question_id, survey_id, pregunta_texto, tipo_pregunta)
+- options (option_id, question_id, opcion_texto)
+- responses (response_id, player_id, question_id, option_id)
+- categorias, videojuegos, craft_tools
+
+### Relaciones:
+- Usuarios ↔ Roles (1:1)
+- Crafters → Encuestas (1:N)
+- Encuestas → Preguntas (1:N)
+- Preguntas → Opciones (1:N)
+- Players → Respuestas (1:N)
+
+## SISTEMA DE ROLES
+**CRAFTERS:** Crear/editar encuestas, ver análisis, exportar reportes
+**PLAYERS:** Responder encuestas, ganar puntos, ver historial, subir de nivel
+
+## FUNCIONALIDADES PRINCIPALES
+- Autenticación y registro con selección de rol
+- Panel Crafter: Dashboard, constructor encuestas, editor preguntas
+- Panel Player: Encuestas disponibles, sistema respuesta, progreso
+- Análisis: Gráficos interactivos, insights automáticos, exportación PDF
+- Gamificación: Puntos, niveles, logros, ranking
+
+## ESTRUCTURA PROYECTO
+surveycraft-platform/
+├── src/main/java/com/surveycraft/
+│   ├── config/ (SecurityConfig, WebConfig)
+│   ├── controller/ (Auth, Crafter, Player, Survey)
+│   ├── entity/ (User, Survey, Question, Response)
+│   ├── repository/ (JPA Repositories)
+│   ├── service/ (Business Logic)
+│   └── dto/ (Data Transfer Objects)
+├── src/main/resources/
+│   ├── static/css/, js/, images/
+│   ├── templates/ (fragments, auth, crafter, player)
+│   └── application.properties
+├── database/ (schema.sql, data.sql)
+└── docs/
+
+## CONFIGURACIÓN TÉCNICA
+**Dependencias:** Spring Boot Web, Security, Data JPA, Thymeleaf, Oracle JDBC
+**Puerto:** 8080
+**Database:** Oracle XE (jdbc:oracle:thin:@localhost:1521:XE)
+
+## PLAN DESARROLLO
+**Fase 1:** Setup Spring Boot + Oracle + Autenticación
+**Fase 2:** Paneles Crafter/Player + CRUD Encuestas
+**Fase 3:** Sistema Análisis + Gráficos + Gamificación
+**Fase 4:** Testing + Optimización + Documentación
+
+##Flujo con nueva idea implementada:
+Crafter → Crea Encuesta ESPECÍFICA → Player Responde → 
+→ Datos Accionables por Juego + Resultados Genéricos
+
+**SURVEYCRAFT GAMING PLATFORM - IDEA FINAL**
+
+**CONCEPTO BASE:**
+Facebook/Twitter pero dedicado exclusivamente a encuestas de videojuegos, con roles separados y gamificación.
+
+**FLUJO DE USUARIO:**
+1. Pantalla Inicio → Login/Registro
+2. Selección de Rol (Crafter o Player)
+3. Feed Principal estilo Facebook de encuestas
+
+**PANTALLA INICIO:**
+- Logo SurveyCraft con temática gaming
+- Botones: Iniciar Sesión / Registrarse
+- Fondo con elementos gaming sutiles
+
+**LOGIN/REGISTRO:**
+- Formulario simple: Email + Contraseña
+- Opción: "¿No tienes cuenta? Regístrate"
+- Registro: Email, Usuario, Contraseña, Confirmar Contraseña
+
+**SELECCIÓN DE ROL:**
+🧙‍♂️ CRAFTER (Creador)
+"Para estudios, youtubers, analistas"
+• Crear encuestas profesionales
+• Ver analytics detallados
+• Gestionar múltiples encuestas
+
+🎮 PLAYER (Jugador)
+"Para gamers que quieren opinar"
+• Responder encuestas divertidas
+• Ganar puntos y niveles
+• Influir en la comunidad gaming
+
+**FEED PLAYER (Estilo Facebook):**
+- Header: Saludo + Nivel + Puntos
+- Sección: ENCUESTAS RECOMENDADAS
+- Tarjetas de encuesta con:
+  * Título llamativo
+  * Creador
+  * Estadísticas (respuestas, tiempo)
+  * Recompensa en puntos
+  * Botón RESPONDER
+- Sección TRENDING: Temas populares
+
+**FEED CRAFTER (Dashboard):**
+- Header: Panel Crafter + Nombre
+- Sección: ESTADÍSTICAS (encuestas activas, respuestas totales, tasa finalización)
+- Sección: ACCIONES RÁPIDAS (Crear Encuesta, Ver Analytics, Gestionar)
+- Sección: TUS ENCUESTAS ACTIVAS con:
+  * Título encuesta
+  * Estadísticas (respuestas, progreso)
+  * Botones (Editar, Ver Resultados, Compartir)
+
+**INTERACCIÓN SOCIAL:**
+- Botón RESPONDER
+- Me gusta (❤️ con contador)
+- Comentarios (💬 con contador)
+- Compartir (🔄 con contador)
+- Ver Resultados (📊 después de responder)
+
+**ELEMENTOS SOCIALES:**
+- Seguir Crafters favoritos
+- Compartir encuestas
+- Comentar opiniones
+- Reaccionar a encuestas
+- Guardar encuestas
+
+**NAVEGACIÓN:**
+Header para todos:
+[Logo] | [Buscar] | [Inicio] | [Notificaciones] | [Perfil]
+
+Sidebar Player:
+🏠 Inicio
+📊 Mis Respuestas
+⭐ Favoritos
+👥 Siguiendo
+🏆 Leaderboard
+⚙️ Configuración
+
+Sidebar Crafter:
+🏠 Dashboard
+📝 Crear Encuesta
+📊 Analytics
+👥 Mis Encuestas
+📋 Plantillas
+⚙️ Configuración
+
+**CARACTERÍSTICAS PLAYER:**
+- Feed infinito tipo Facebook
+- Algoritmo de recomendación por gustos
+- Sistema de puntos y niveles visible
+- Progreso personal mostrado
+- Encuestas de amigos y seguidos
+
+**CARACTERÍSTICAS CRAFTER:**
+- Dashboard con métricas clave
+- Acciones rápidas prominentes
+- Lista encuestas con progreso
+- Notificaciones de respuestas
+- Herramientas rápidas gestión
+
+**ESENCIA:**
+Red social vertical para encuestas gaming donde los Crafters crean contenido y los Players interactúan, todo en un feed estilo Facebook con gamificación integrada.
