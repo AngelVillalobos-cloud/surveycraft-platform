@@ -1,0 +1,6 @@
+Options -Indexes
+RewriteEngine On
+
+# Todo lo que no sea un archivo real, va al router (index.php)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [QSA,L]

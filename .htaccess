@@ -1,0 +1,13 @@
+Options -Indexes
+RewriteEngine On
+
+# Responder preflight OPTIONS directamente (CORS)
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^ - [R=204,L]
+
+# Si el archivo existe, servirlo directamente (CSS, JS, imágenes)
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+# Redirigir cualquier ruta /api/* al router PHP
+RewriteRule ^api(/.*)?$ api/index.php [QSA,L]
