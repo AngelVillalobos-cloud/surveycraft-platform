@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SurveyCraft - Plataforma Gamer de Encuestas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+
+  <div id="app">
+    <!-- Auth Section -->
+    <div id="auth-container" class="glass-card auth-box">
+      <div class="auth-header">
+        <div class="brand-badge">🎮 SurveyCraft</div>
+        <h1 id="auth-title">Bienvenido de nuevo</h1>
+        <p class="auth-subtitle">Inicia sesión para votar o crear tus encuestas de videojuegos</p>
+      </div>
+
+      <form id="auth-form">
+        <div class="form-group">
+          <label for="email">Correo electrónico</label>
+          <input type="email" id="email" placeholder="gamer@ejemplo.com" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" placeholder="••••••••" required>
+        </div>
+
+        <!-- Extra fields for Register -->
+        <div id="register-fields" class="hidden">
+          <div class="form-group">
+            <label for="name">Nombre de usuario</label>
+            <input type="text" id="name" placeholder="Tu GamerTag o Nombre">
+          </div>
+          <div class="form-group">
+            <label for="role">Rol inicial <span class="text-hint">(podrás cambiarlo en cualquier momento)</span></label>
+            <select id="role">
+              <option value="PLAYER">🎮 Jugador (Responder encuestas)</option>
+              <option value="CRAFTER">🛠️ Crafter / Creador (Crear encuestas)</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" id="submit-btn" class="btn btn-primary btn-block">Iniciar Sesión</button>
+      </form>
+
+      <div class="auth-footer">
+        <a href="#" id="toggle-auth">¿No tienes cuenta? Regístrate aquí</a>
+      </div>
+    </div>
+
+    <!-- Dashboard Section -->
+    <div id="dashboard-container" class="hidden">
+      <!-- Top Navigation -->
+      <header class="nav-bar glass-card">
+        <div class="nav-brand">
+          <span class="brand-icon">🎮</span>
+          <div>
+            <h2 class="brand-title">SurveyCraft</h2>
+            <span class="brand-tagline">Comunidad de Videojuegos</span>
+          </div>
+        </div>
+
+        <div class="nav-actions">
+          <!-- Role Switcher & User Profile -->
+          <div class="user-pill glass-pill">
+            <div class="user-avatar" id="user-avatar">U</div>
+            <div class="user-info">
+              <span id="user-name" class="user-name">Usuario</span>
+              <span id="user-role-badge" class="badge badge-role">Jugador</span>
+            </div>
+          </div>
+
+          <!-- Quick Role Switch Button -->
+          <button id="switch-role-btn" class="btn btn-switch btn-sm" title="Alternar entre modo Jugador y Crafter sin salir">
+            <span class="switch-icon">🔄</span>
+            <span id="switch-role-text">Cambiar a Modo Crafter</span>
+          </button>
+
+          <button id="logout-btn" class="btn btn-outline-danger btn-sm" title="Cerrar sesión">
+            <span>Salir</span> ✕
+          </button>
+        </div>
+      </header>
+
+      <!-- Dashboard Hero & Quick Stats -->
+      <section class="dashboard-hero glass-card">
+        <div class="hero-content">
+          <h1 id="hero-welcome">¡Hola de nuevo, <span class="highlight-user">Gamer</span>! 👋</h1>
+          <p class="hero-desc">Descubre lo que opina la comunidad sobre tus juegos favoritos o crea encuestas con opciones dinámicas.</p>
+        </div>
+        <div class="hero-actions">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="survey-search" placeholder="Buscar por título, videojuego o autor...">
+          </div>
+          <div id="crafter-actions" class="hidden">
+            <button id="create-survey-btn" class="btn btn-primary btn-glow">
+              <span>+ Nueva Encuesta</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Navigation Tabs -->
+      <div id="survey-tabs" class="tabs-container">
+        <div class="tabs">
+          <button class="tab active" data-tab="all">
+            <span class="tab-icon">🌐</span> Todas las Encuestas
+          </button>
+          <button class="tab" data-tab="answered">
+            <span class="tab-icon">✅</span> Encuestas Respondidas
+          </button>
+          <button class="tab hidden" id="tab-mine" data-tab="mine">
+            <span class="tab-icon">📁</span> Mis Encuestas Creadas
+          </button>
+        </div>
+      </div>
+
+      <!-- Surveys Grid Section -->
+      <main class="surveys-section">
+        <div class="section-header">
+          <h3 id="list-title">Encuestas Disponibles</h3>
+          <span id="survey-count" class="badge badge-counter">0 disponibles</span>
+        </div>
+
+        <div id="surveys-list" class="surveys-grid">
+          <div class="spinner"></div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Create/Edit Survey Modal -->
+    <div id="create-survey-modal" class="modal-overlay hidden">
+      <div class="glass-card modal-content modal-lg">
+        <div class="modal-header">
+          <div>
+            <h3 id="modal-form-title">Crear Nueva Encuesta</h3>
+            <p class="modal-subtitle">Configura los datos y añade preguntas con opciones a tu gusto.</p>
+          </div>
+          <button type="button" class="modal-close" onclick="document.getElementById('cancel-create-btn').click()">✕</button>
+        </div>
+
+        <div class="form-group">
+          <label>Título de la Encuesta <span class="required">*</span></label>
+          <input type="text" id="new-survey-title" placeholder="Ej: ¿Qué te pareció la última actualización?">
+        </div>
+
+        <div class="form-group">
+          <label>Descripción detallada</label>
+          <textarea id="new-survey-desc" placeholder="Cuéntanos un poco sobre el objetivo de esta encuesta..." rows="3"></textarea>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Videojuego asociado <span class="required">*</span></label>
+            <div class="game-select-group">
+              <select id="new-survey-game">
+                <option value="">Cargando juegos...</option>
+              </select>
+              <button id="open-create-game-btn" type="button" class="btn btn-secondary btn-icon" title="Crear nuevo videojuego">+</button>
+            </div>
+            <p class="input-hint">¿No está en la lista? Haz clic en <strong>+</strong> para agregarlo inmediatamente.</p>
+          </div>
+
+          <div class="form-group">
+            <label>Tipo de Encuesta</label>
+            <select id="new-survey-type">
+              <option value="SATISFACCION">🌟 Satisfacción General</option>
+              <option value="BUG_REPORT">🐛 Reporte de Bugs</option>
+              <option value="FEATURE_REQUEST">💡 Solicitud de Funcionalidad</option>
+              <option value="BALANCE">⚖️ Balance y Jugabilidad</option>
+              <option value="OTRO">📌 Otro</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Dynamic Questions Container -->
+        <div class="questions-section">
+          <div class="questions-section-header">
+            <h4>Preguntas de la Encuesta</h4>
+            <span class="text-muted text-sm">(Mínimo 2 opciones por pregunta, añade tantas como necesites)</span>
+          </div>
+
+          <div id="questions-container" class="questions-list">
+            <!-- Dynamic Questions go here -->
+          </div>
+
+          <button id="add-question-btn" type="button" class="btn btn-outline-primary btn-block">
+            <span>+ Agregar Otra Pregunta</span>
+          </button>
+        </div>
+
+        <div class="modal-footer">
+          <button id="cancel-create-btn" type="button" class="btn btn-outline-danger">Cancelar</button>
+          <button id="save-survey-btn" type="button" class="btn btn-success btn-glow">Guardar Encuesta</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create Game Modal -->
+    <div id="create-game-modal" class="modal-overlay hidden">
+      <div class="glass-card modal-content modal-md">
+        <div class="modal-header">
+          <div>
+            <h3>Agregar Nuevo Videojuego</h3>
+            <p class="modal-subtitle">Se guardará en la base de datos y se seleccionará para tu encuesta.</p>
+          </div>
+          <button type="button" class="modal-close" onclick="document.getElementById('cancel-create-game-btn').click()">✕</button>
+        </div>
+
+        <div class="form-group">
+          <label>Título del Juego <span class="required">*</span></label>
+          <input type="text" id="new-game-title" placeholder="Ej: Hollow Knight, Elden Ring, Valorant...">
+        </div>
+
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea id="new-game-desc" placeholder="Breve reseña del juego..." rows="2"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Categoría / Género <span class="required">*</span></label>
+          <input type="text" id="new-game-category" placeholder="Ej: Metroidvania, RPG, Shooter, Sandbox...">
+          <p class="input-hint">Si la categoría no existe en el sistema, se registrará de forma automática.</p>
+        </div>
+
+        <div class="modal-footer">
+          <button id="cancel-create-game-btn" type="button" class="btn btn-outline-danger">Cancelar</button>
+          <button id="save-game-btn" type="button" class="btn btn-success">Guardar Videojuego</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Response Modal -->
+    <div id="response-modal" class="modal-overlay hidden">
+      <div class="glass-card modal-content modal-lg">
+        <div class="modal-header">
+          <div>
+            <h3 id="modal-title">Responder Encuesta</h3>
+            <div id="modal-survey-meta" class="survey-author-badge">
+              <span>👤 Creado por: <strong id="modal-author-name">Crafter</strong></span>
+            </div>
+          </div>
+          <button type="button" class="modal-close" onclick="document.getElementById('close-modal-btn').click()">✕</button>
+        </div>
+
+        <!-- Metadata Fields -->
+        <div class="grid-2 modal-meta-box">
+          <div class="form-group">
+            <label>Tiempo Jugado al Videojuego</label>
+            <select id="resp-time">
+              <option value="< 10h">Menos de 10 horas</option>
+              <option value="10-50h">10 a 50 horas</option>
+              <option value="50-100h">50 a 100 horas</option>
+              <option value="> 100h">Más de 100 horas (Veterano)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Plataforma en que lo juegas</label>
+            <select id="resp-platform">
+              <option value="PC">🖥️ PC</option>
+              <option value="PlayStation">🎮 PlayStation</option>
+              <option value="Xbox">🎮 Xbox</option>
+              <option value="Nintendo">🕹️ Nintendo Switch</option>
+              <option value="Mobile">📱 Móvil (Android / iOS)</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="modal-questions" class="response-questions-list"></div>
+
+        <div class="modal-footer">
+          <button id="close-modal-btn" type="button" class="btn btn-outline-danger">Cancelar</button>
+          <button id="submit-response-btn" type="button" class="btn btn-success btn-glow">Enviar Mi Respuesta</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+
+</html>

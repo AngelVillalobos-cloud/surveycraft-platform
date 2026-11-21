@@ -1,0 +1,18 @@
+# Logs
+*.log
+
+# Windows thumbnail cache
+Thumbs.db
+ehthumbs.db
+
+# Desktop.ini
+[Dd]esktop.ini
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store

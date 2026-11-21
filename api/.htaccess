@@ -1,0 +1,10 @@
+Options -Indexes
+RewriteEngine On
+
+# Pasar header Authorization a PHP
+RewriteCond %{HTTP:Authorization} .
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+# Todo lo que no sea un archivo real, va al router (index.php)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [QSA,L]
